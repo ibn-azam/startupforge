@@ -41,7 +41,7 @@ export default function Footer() {
         <div className="max-w-xs">
           <Link href="/" aria-label="StartForge Home">
             <h2 className="text-2xl font-bold">
-              <span className="text-[#131B3A]">Start</span>
+              <span className="text-[#131B3A]">Startup</span>
               <span className="text-[#FF6B35]">Forge</span>
             </h2>
           </Link>

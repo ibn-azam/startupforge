@@ -1,9 +1,10 @@
 'use client'
 import { useState } from "react";
-import { Button } from "@heroui/react";
+import { Button, Spinner } from "@heroui/react";
 import Image from "next/image";
 import Link from "next/link";
 import { authClient, useSession } from "@/lib/auth-client";
+import { ProfileDropdown } from "./ProfileDropdown";
 
 
 
@@ -22,14 +23,14 @@ export default function Navbar() {
         {/* Logo - left */}
         <Link href="/">
          <h2 className="text-2xl font-bold">
-            <span className="text-[#131B3A]">Start</span>
+            <span className="text-[#131B3A]">Startup</span>
             <span className="text-[#FF6B35]">Forge</span>
          </h2>
         </Link>
 
         {/* Mobile menu button */}
         <button
-          className="text-white md:hidden"
+          className="text-[#131B3A] md:hidden"
           onClick={() => setIsMenuOpen(!isMenuOpen)}
           aria-label="Toggle menu"
           aria-expanded={isMenuOpen}
@@ -80,16 +81,16 @@ export default function Navbar() {
             </li>
           </ul>
 
-          <div className="h-5 w-px" />
+          <div className="h-5 w-px bg-[#6B7280]/20" />
 
-          {user ? <>
-            Hi,{user.name}!
-            <Link href="/login">
-                <Button onClick={handleSignOut} variant="danger">
-              Sign Out
-            </Button>
-            </Link>
-          </> : <>
+          {isPending ? (<div><Spinner className="text-[#FF6B35]" size="md" /></div>) : user ? (<>
+          <ProfileDropdown user={user}/>
+             <Link href="/login">
+                            <Button onClick={handleSignOut} variant="danger">
+                          Sign Out
+                        </Button>
+                        </Link>
+          </>) : (<>
             <Link href="/login" className="text-sm font-medium text-[#131B3A] hover:text-[#FF6B35]">
             Login
           </Link>
@@ -98,7 +99,7 @@ export default function Navbar() {
                 SignUp
             </Button>
           </Link>
-          </>}
+          </>)}
 
           
         </div>
@@ -123,14 +124,14 @@ export default function Navbar() {
               </Link>
             </li>
           </ul>
-           {user ? <div className="mx-10">
-            Hi,{user.name}!
+           {isPending ? <div><Spinner className="text-[#FF6B35]" size="md" /></div> : user ? <div className="mx-4 my-2 flex flex-col gap-4">
+            <h4 className="font-semibold text-md text-[#131B3A]">Hi, {user.name}!</h4>
             <Link href="/login">
                 <Button className='w-full' onClick={handleSignOut} variant="danger">
               Sign Out
             </Button>
             </Link>
-          </div> : <div className="flex flex-col gap-4 mx-2">
+          </div> : <div className="flex flex-col gap-4 mx-4">
             <Link href="/login" className="text-sm font-medium text-[#131B3A] hover:text-[#FF6B35]">
             <Button className='w-full' variant="ghost">
                 Login
