@@ -11,6 +11,7 @@ import {
   Select,
   ListBox,
   Button,
+  Card,
 } from "@heroui/react";
 
 import {
@@ -50,6 +51,12 @@ export default function CreateStartupPage() {
   const router = useRouter();
 
   const { data: session } = authClient.useSession();
+
+  const [mockCompany] = useState({
+    name: "Acme Corp (Auto-filled)",
+    id: "company_123",
+    isApproved: true,
+  })
 
   const [name, setName] = useState("");
   const [industry, setIndustry] = useState(null);
@@ -184,6 +191,8 @@ const handleLogoChange = async (e) => {
       description: description.trim(),
       fundingStage: String(fundingStage),
       founderEmail: founderEmail.trim(),
+      companyId: mockCompany.id,
+      status:"active",
     };
 
      
@@ -222,9 +231,10 @@ const handleLogoChange = async (e) => {
 };
 
   return (
-    <form
+   <Card className="max-w-xl mx-auto my-8 bg-[#FAFAFA] shadow-md border border-[#6B7280]/10">
+     <form
       onSubmit={handleSubmit}
-      className="mx-auto max-w-xl space-y-6 p-6"
+      className="mx-auto w-full space-y-6 p-6"
     >
       <div>
         <h1 className="font-space-grotesk text-2xl font-bold text-[#131B3A]">
@@ -418,5 +428,6 @@ const handleLogoChange = async (e) => {
         {submitting ? "Creating Startup..." : "Create Startup"}
       </Button>
     </form>
+   </Card>
   );
 }

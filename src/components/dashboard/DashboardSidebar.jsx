@@ -9,7 +9,7 @@ export function DashboardSidebar() {
   const pathname = usePathname();
   const navItems = [
     {icon: House,href:'/dashboard/founder', label: "Overview"},
-    {icon: Magnifier,href:'/dashboard/founder/jobs', label: "My Startups"},
+    {icon: Magnifier,href:'/dashboard/founder/startups', label: "My Startups"},
     {icon: Envelope,href:'/dashboard/founder/startups/new', label: "Create Startup"},
     
   ];
