@@ -11,6 +11,8 @@ export function DashboardSidebar() {
     {icon: House,href:'/dashboard/founder', label: "Overview"},
     {icon: Magnifier,href:'/dashboard/founder/startups', label: "My Startups"},
     {icon: Envelope,href:'/dashboard/founder/startups/new', label: "Create Startup"},
+    {icon: Envelope,href:'/dashboard/founder/opportunities', label: "My Opportunities"},
+    {icon: Envelope,href:'/dashboard/founder/opportunities/new', label: "Create Opportunity"},
     
   ];
 

@@ -12,3 +12,13 @@ export const createStartup = async(newStartupData)=>{
     });
     return res.json();
 }
+export const createOpportunity = async(newOpportunityData)=>{
+    const res = await fetch(`${baseUrl}/api/opportunity`,{
+        method:'POST',
+        headers:{
+            'Content-Type' : 'application/json',
+        },
+        body: JSON.stringify(newOpportunityData)
+    });
+    return res.json();
+}
