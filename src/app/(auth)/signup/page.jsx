@@ -194,7 +194,7 @@ const SignUpPage = () => {
                             orientation="horizontal"
                             className="flex flex-col sm:flex-row gap-3 sm:gap-6"
                         >
-                            <Radio value="seeker">
+                            <Radio value="collaborator">
                                 <Radio.Content>
                                     <Radio.Control>
                                         <Radio.Indicator />
@@ -202,7 +202,7 @@ const SignUpPage = () => {
                                     Collaborator
                                 </Radio.Content>
                             </Radio>
-                            <Radio value="requiter">
+                            <Radio value="founder">
                                 <Radio.Content>
                                     <Radio.Control>
                                         <Radio.Indicator />

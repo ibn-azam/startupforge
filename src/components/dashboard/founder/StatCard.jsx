@@ -3,15 +3,7 @@
 import React from "react";
 import { Card } from "@heroui/react";
 
-/**
- * Reusable Stat Card (HeroUI v3 API)
- *
- * @param {Object} props
- * @param {string} props.title - The title text (e.g. "Total Job Posts")
- * @param {string|number} props.value - The statistic value (e.g. 48 or "1,284")
- * @param {React.ElementType} [props.icon] - The Gravity UI icon component
- * @param {string} [props.className] - Optional extra Tailwind classes for container customization
- */
+
 export default function StatCard({ title, value, icon: Icon, className = "" }) {
   const formattedValue =
     typeof value === "number" ? value.toLocaleString() : value;

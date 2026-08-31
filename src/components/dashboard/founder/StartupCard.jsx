@@ -63,7 +63,7 @@ const StartupCard = ({ startup }) => {
         throw new Error(data?.message || `Request failed with status ${response.status}`);
       }
       toast.success('Startup Deleted Successfully')
-      router.refresh();
+      window.location.reload();
     } catch (error) {
       toast.error(error.message || "Something went wrong while deleting the startup.");
     } finally {
@@ -153,7 +153,7 @@ const StartupCard = ({ startup }) => {
 
       setIsEditing(false);
       toast.success('Startup Updated Successfully')
-      router.refresh();
+      window.location.reload();
     } catch (error) {
       console.error("Edit error:", error);
       alert(error.message || "Something went wrong while updating the startup.");

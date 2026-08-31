@@ -11,6 +11,7 @@ const recruiterStats = [
   ];
 
 const FounderDashboardPage = () => {
+    
     return (
         <div className="flex flex-col gap-6 p-6">
         <h2 className="text-2xl font-bold text-[#131B3A]">Founder Dashboard</h2>

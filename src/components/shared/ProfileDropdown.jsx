@@ -1,5 +1,6 @@
 import {ArrowRightFromSquare, Gear, Persons} from "@gravity-ui/icons";
 import {Avatar, Dropdown, Label} from "@heroui/react";
+import Link from "next/link";
 
 export function ProfileDropdown({user}) {
   return (
@@ -31,11 +32,15 @@ export function ProfileDropdown({user}) {
         </div>
         <Dropdown.Menu>
           <Dropdown.Item id="dashboard" textValue="Dashboard">
-            <Label>Dashboard</Label>
+            <Link href="/dashboard/founder">
+              <Label>Dashboard</Label>
+            </Link>
           </Dropdown.Item>
           <Dropdown.Item id="profile" textValue="Profile">
             <div className="flex w-full items-center justify-between gap-2">
-              <Label>Profile</Label>
+              <Link href="/profile">
+                <Label>Profile</Label>
+              </Link>
               <Persons className="size-3.5 text-muted" />
             </div>
           </Dropdown.Item>
