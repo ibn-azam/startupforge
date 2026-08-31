@@ -16,6 +16,7 @@ import {
 
 import { toast } from "react-toastify";
 import { createOpportunity } from "@/lib/actions/startups";
+import { useSession } from "@/lib/auth-client";
 
 
 
@@ -33,11 +34,8 @@ const COMMITMENT_LEVELS = [
 
 export default function AddOpportunityPage() {
   const router = useRouter();
-  const [mockCompany] = useState({
-      name: "Acme Corp (Auto-filled)",
-      id: "company_123",
-      isApproved: true,
-    })
+  const {data:session} = useSession();
+  const user = session?.user;
 
   const [roleTitle, setRoleTitle] = useState("");
   const [requiredSkills, setRequiredSkills] = useState("");
@@ -82,7 +80,7 @@ export default function AddOpportunityPage() {
         workType: String(workType),
         commitmentLevel: String(commitmentLevel),
         deadline,
-        companyId:mockCompany.id,
+        founderEmail: user?.email,
       };
 
       const data = await createOpportunity(payload);

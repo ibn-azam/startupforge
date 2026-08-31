@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "@heroui/react";
 import {
   Calendar,
@@ -43,9 +42,7 @@ const emptyForm = (opportunity) => ({
 const fieldClass =
   "mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:border-[#FF6B35] focus:outline-none";
 
-const OpportunityCard = ({ opportunity }) => {
-  const router = useRouter();
-
+const OpportunityCard = ({ opportunity, onUpdate, onDelete }) => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -84,7 +81,7 @@ const OpportunityCard = ({ opportunity }) => {
       }
 
       toast.success("Opportunity Deleted Successfully");
-      router.refresh();
+      onDelete?.(_id);
     } catch (error) {
       toast.error(error.message || "Something went wrong while deleting the opportunity.");
     } finally {
@@ -106,7 +103,7 @@ const OpportunityCard = ({ opportunity }) => {
     const trimmedRoleTitle = form.roleTitle.trim();
 
     if (trimmedRoleTitle === "") {
-      alert("Role title cannot be empty.");
+      toast.error("Role title cannot be empty.");
       return;
     }
 
@@ -155,10 +152,10 @@ const OpportunityCard = ({ opportunity }) => {
 
       setIsEditing(false);
       toast.success("Opportunity Updated Successfully");
-      router.refresh();
+      onUpdate?.({ ...opportunity, ...payload });
     } catch (error) {
       console.error("Edit error:", error);
-      alert(error.message || "Something went wrong while updating the opportunity.");
+      toast.error(error.message || "Something went wrong while updating the opportunity.");
     } finally {
       setIsSaving(false);
     }

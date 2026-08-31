@@ -1,12 +1,72 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { getFounderOpportunities } from "@/lib/api/opportunities";
 import OpportunityCard from "@/components/dashboard/founder/OpportunityCard";
 import Link from "next/link";
+import { useSession } from "@/lib/auth-client";
 
-const AllOpportunitiesPage = async () => {
-  const companyId = "company_123";
+const AllOpportunitiesPage = () => {
+  const { data: session, isPending: sessionLoading } = useSession();
+  const user = session?.user;
 
-  const opportunities = await getFounderOpportunities(companyId);
-  console.log(opportunities)
+  const [opportunities, setOpportunities] = useState([]);
+  const [loadingOpportunities, setLoadingOpportunities] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadOpportunities = async () => {
+      const email = user?.email;
+
+      if (!email) {
+        if (!sessionLoading) {
+          setOpportunities([]);
+          setLoadingOpportunities(false);
+        }
+        return;
+      }
+
+      try {
+        const data = await getFounderOpportunities(email);
+
+        if (cancelled) return;
+
+        const list = Array.isArray(data)
+          ? data
+          : Array.isArray(data?.opportunities)
+            ? data.opportunities
+            : Array.isArray(data?.data)
+              ? data.data
+              : [];
+
+        setOpportunities(list);
+      } catch (err) {
+        console.error("Failed to fetch opportunities:", err);
+        if (!cancelled) setOpportunities([]);
+      } finally {
+        if (!cancelled) setLoadingOpportunities(false);
+      }
+    };
+
+    loadOpportunities();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.email, sessionLoading]);
+
+  const handleOpportunityUpdate = (updated) => {
+    setOpportunities((prev) =>
+      prev.map((o) => (o._id === updated._id ? { ...o, ...updated } : o))
+    );
+  };
+
+  const handleOpportunityDelete = (deletedId) => {
+    setOpportunities((prev) => prev.filter((o) => o._id !== deletedId));
+  };
+
+  const hasOpportunities = opportunities && opportunities.length > 0;
 
   return (
     <div className="min-h-screen  p-6">
@@ -32,8 +92,15 @@ const AllOpportunitiesPage = async () => {
           </Link>
         </div>
 
+        {/* Loading */}
+        {loadingOpportunities && (
+          <div className="flex min-h-[200px] items-center justify-center">
+            <p className="text-sm text-gray-500">Loading opportunities...</p>
+          </div>
+        )}
+
         {/* Empty State */}
-        {(!opportunities || opportunities.length === 0) && (
+        {!loadingOpportunities && !hasOpportunities && (
           <div className="flex min-h-[350px] flex-col items-center justify-center rounded-2xl border border-dashed border-gray-300 bg-white p-10 text-center">
             <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100 text-2xl">
               🧩
@@ -58,12 +125,14 @@ const AllOpportunitiesPage = async () => {
         )}
 
         {/* Opportunity Cards */}
-        {opportunities && opportunities.length > 0 && (
+        {!loadingOpportunities && hasOpportunities && (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
             {opportunities.map((opportunity) => (
               <OpportunityCard
                 key={opportunity._id}
                 opportunity={opportunity}
+                onUpdate={handleOpportunityUpdate}
+                onDelete={handleOpportunityDelete}
               />
             ))}
           </div>
