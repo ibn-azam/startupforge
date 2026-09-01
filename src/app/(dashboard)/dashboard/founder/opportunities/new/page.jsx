@@ -18,10 +18,6 @@ import { toast } from "react-toastify";
 import { createOpportunity } from "@/lib/actions/startups";
 import { useSession } from "@/lib/auth-client";
 
-
-
-
-
 const WORK_TYPES = ["Remote", "Onsite", "Hybrid"];
 
 const COMMITMENT_LEVELS = [
@@ -34,7 +30,7 @@ const COMMITMENT_LEVELS = [
 
 export default function AddOpportunityPage() {
   const router = useRouter();
-  const {data:session} = useSession();
+  const { data: session } = useSession();
   const user = session?.user;
 
   const [roleTitle, setRoleTitle] = useState("");
@@ -42,7 +38,6 @@ export default function AddOpportunityPage() {
   const [workType, setWorkType] = useState(null);
   const [commitmentLevel, setCommitmentLevel] = useState(null);
   const [deadline, setDeadline] = useState("");
-
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
@@ -68,6 +63,12 @@ export default function AddOpportunityPage() {
       return;
     }
 
+    if (!user?.email) {
+      setError("User email not found.");
+      toast.error("User email not found.");
+      return;
+    }
+
     setSubmitting(true);
 
     try {
@@ -80,24 +81,32 @@ export default function AddOpportunityPage() {
         workType: String(workType),
         commitmentLevel: String(commitmentLevel),
         deadline,
-        founderEmail: user?.email,
+        founderEmail: user.email,
       };
 
       const data = await createOpportunity(payload);
-      
 
-      toast.success("Opportunity added successfully!");
+      if (data?.insertedId) {
+        toast.success("Opportunity added successfully!");
 
-      // Reset form
-      setRoleTitle("");
-      setRequiredSkills("");
-      setWorkType(null);
-      setCommitmentLevel(null);
-      setDeadline("");
+        // Reset form
+        setRoleTitle("");
+        setRequiredSkills("");
+        setWorkType(null);
+        setCommitmentLevel(null);
+        setDeadline("");
 
-      router.push("/dashboard/founder/opportunities");
+        router.push("/dashboard/founder/opportunities");
+      } else {
+        const message =
+          data?.message || "Failed to add opportunity.";
+
+        setError(message);
+        toast.error(message);
+      }
     } catch (error) {
-      const message = error?.message || "Something went wrong.";
+      const message =
+        error?.message || "Opportunity creation failed";
 
       setError(message);
       toast.error(message);
@@ -168,7 +177,11 @@ export default function AddOpportunityPage() {
           <Select.Popover>
             <ListBox>
               {WORK_TYPES.map((item) => (
-                <ListBox.Item key={item} id={item} textValue={item}>
+                <ListBox.Item
+                  key={item}
+                  id={item}
+                  textValue={item}
+                >
                   {item}
                   <ListBox.ItemIndicator />
                 </ListBox.Item>
@@ -193,7 +206,11 @@ export default function AddOpportunityPage() {
           <Select.Popover>
             <ListBox>
               {COMMITMENT_LEVELS.map((level) => (
-                <ListBox.Item key={level} id={level} textValue={level}>
+                <ListBox.Item
+                  key={level}
+                  id={level}
+                  textValue={level}
+                >
                   {level}
                   <ListBox.ItemIndicator />
                 </ListBox.Item>
@@ -229,7 +246,9 @@ export default function AddOpportunityPage() {
           isLoading={submitting}
           className="w-full bg-[#FF6B35] font-medium text-white"
         >
-          {submitting ? "Adding Opportunity..." : "Add Opportunity"}
+          {submitting
+            ? "Adding Opportunity..."
+            : "Add Opportunity"}
         </Button>
       </form>
     </Card>

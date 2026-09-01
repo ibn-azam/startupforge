@@ -10,6 +10,7 @@ const BrowseOpportunitiesPage = () => {
     const [opportunities, setOpportunities] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [activeType, setActiveType] = useState('All');
+    const [activeCommitment, setActiveCommitment] = useState('All');
 
     useEffect(() => {
         const fetchData = async () => {
@@ -26,8 +27,10 @@ const BrowseOpportunitiesPage = () => {
                 skill.toLowerCase().includes(searchTerm.toLowerCase())
             );
         const matchesType = activeType === 'All' || opp.workType === activeType;
-        return matchesSearch && matchesType;
+        const matchesCommitment = activeCommitment === 'All' || opp.commitmentLevel === activeCommitment;
+        return matchesSearch && matchesType && matchesCommitment;
     });
+     
 
     return (
         <div className="p-6">
@@ -49,6 +52,8 @@ const BrowseOpportunitiesPage = () => {
             <OpportunitiesFilterTab
                 activeType={activeType}
                 setActiveType={setActiveType}
+                activeCommitment={activeCommitment}
+                setActiveCommitment=    {setActiveCommitment}
             />
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

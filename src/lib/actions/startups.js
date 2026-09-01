@@ -20,5 +20,9 @@ export const createOpportunity = async(newOpportunityData)=>{
         },
         body: JSON.stringify(newOpportunityData)
     });
-    return res.json();
+    const data =await res.json();
+    if(!res.ok){
+        throw new Error(data.message || 'Failed to create opportunity');
+    }
+    return data;
 }
