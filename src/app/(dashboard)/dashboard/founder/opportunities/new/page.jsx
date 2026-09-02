@@ -27,6 +27,7 @@ const COMMITMENT_LEVELS = [
   "Internship",
   "Volunteer",
 ];
+const INDUSTRIES = ["Development", "Design", "Marketing", "Product", "Sales"];
 
 export default function AddOpportunityPage() {
   const router = useRouter();
@@ -37,6 +38,7 @@ export default function AddOpportunityPage() {
   const [requiredSkills, setRequiredSkills] = useState("");
   const [workType, setWorkType] = useState(null);
   const [commitmentLevel, setCommitmentLevel] = useState(null);
+  const [industry, setIndustry] = useState(null);
   const [deadline, setDeadline] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -56,6 +58,7 @@ export default function AddOpportunityPage() {
       !requiredSkills.trim() ||
       !workType ||
       !commitmentLevel ||
+      !industry ||        
       !deadline
     ) {
       setError("Please fill in all required fields.");
@@ -80,6 +83,7 @@ export default function AddOpportunityPage() {
           .filter(Boolean),
         workType: String(workType),
         commitmentLevel: String(commitmentLevel),
+        industry: String(industry),
         deadline,
         founderEmail: user.email,
       };
@@ -94,6 +98,7 @@ export default function AddOpportunityPage() {
         setRequiredSkills("");
         setWorkType(null);
         setCommitmentLevel(null);
+        setIndustry(null);
         setDeadline("");
 
         router.push("/dashboard/founder/opportunities");
@@ -218,6 +223,31 @@ export default function AddOpportunityPage() {
             </ListBox>
           </Select.Popover>
         </Select>
+
+        {/* INDUSTRY */}
+<Select
+  value={industry}
+  onChange={setIndustry}
+  placeholder="Select industry"
+>
+  <Label>Industry</Label>
+
+  <Select.Trigger>
+    <Select.Value />
+    <Select.Indicator />
+  </Select.Trigger>
+
+  <Select.Popover>
+    <ListBox>
+      {INDUSTRIES.map((item) => (
+        <ListBox.Item key={item} id={item} textValue={item}>
+          {item}
+          <ListBox.ItemIndicator />
+        </ListBox.Item>
+      ))}
+    </ListBox>
+  </Select.Popover>
+</Select>
 
         {/* DEADLINE */}
         <TextField name="deadline" isRequired>

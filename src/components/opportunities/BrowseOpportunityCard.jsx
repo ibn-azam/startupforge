@@ -31,6 +31,7 @@ const BrowseOpportunityCard = ({ opportunity }) => {
     requiredSkills = [],
     workType,
     commitmentLevel,
+    industry,
     deadline,
   } = opportunity;
 
@@ -56,9 +57,16 @@ const BrowseOpportunityCard = ({ opportunity }) => {
       <div className="p-6">
         <h3 className="line-clamp-1 text-xl font-bold text-[#131B3A]">{roleTitle}</h3>
 
-        {commitmentLevel && (
-          <p className="mt-1 text-sm font-medium text-[#FF6B35]">{commitmentLevel}</p>
-        )}
+        <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
+          {commitmentLevel && (
+            <p className="text-sm font-medium text-[#FF6B35]">{commitmentLevel}</p>
+          )}
+          {industry && (
+            <span className="rounded-md bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
+              {industry}
+            </span>
+          )}
+        </div>
 
         {requiredSkills.length > 0 && (
           <div className="mt-4 flex flex-wrap gap-1.5">

@@ -4,33 +4,29 @@ import React, { useEffect, useState } from 'react';
 import { Magnifier } from '@gravity-ui/icons';
 import OpportunitiesFilterTab from '@/components/opportunities/OpportunitiesFilterTab';
 import BrowseOpportunityCard from '@/components/opportunities/BrowseOpportunityCard';
-import { getOpportunities } from '@/lib/api/opportunities';
+import { getOpportunitiesByFilter } from '@/lib/api/opportunities';
 
 const BrowseOpportunitiesPage = () => {
     const [opportunities, setOpportunities] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [activeType, setActiveType] = useState('All');
-    const [activeCommitment, setActiveCommitment] = useState('All');
+    const [activeIndustry, setActiveIndustry] = useState('All');
 
     useEffect(() => {
-        const fetchData = async () => {
-            const data = await getOpportunities();
-            setOpportunities(data);
-        };
-        fetchData();
-    }, []);
+        const timeout = setTimeout(() => {
+            const fetchData = async () => {
+                const data = await getOpportunitiesByFilter({
+                    search: searchTerm,
+                    workType: activeType,
+                    industry: activeIndustry,
+                });
+                setOpportunities(data);
+            };
+            fetchData();
+        }, 300);
 
-    const filtered = opportunities.filter((opp) => {
-        const matchesSearch =
-            opp.roleTitle?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            (opp.requiredSkills || []).some((skill) =>
-                skill.toLowerCase().includes(searchTerm.toLowerCase())
-            );
-        const matchesType = activeType === 'All' || opp.workType === activeType;
-        const matchesCommitment = activeCommitment === 'All' || opp.commitmentLevel === activeCommitment;
-        return matchesSearch && matchesType && matchesCommitment;
-    });
-     
+        return () => clearTimeout(timeout);
+    }, [searchTerm, activeType, activeIndustry]);
 
     return (
         <div className="p-6">
@@ -52,15 +48,15 @@ const BrowseOpportunitiesPage = () => {
             <OpportunitiesFilterTab
                 activeType={activeType}
                 setActiveType={setActiveType}
-                activeCommitment={activeCommitment}
-                setActiveCommitment=    {setActiveCommitment}
+                activeIndustry={activeIndustry}
+                setActiveIndustry={setActiveIndustry}
             />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {filtered.map((opp) => (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 py-4">
+                {opportunities.map((opp) => (
                     <BrowseOpportunityCard key={opp._id} opportunity={opp} />
                 ))}
-                {filtered.length === 0 && (
+                {opportunities.length === 0 && (
                    <div className="col-span-full flex items-center justify-center p-20 border border-gray-200 rounded-lg bg-white shadow-sm">
                     <p className="text-slate-400 text-lg col-span-full text-center">
                         No opportunities match your search.
