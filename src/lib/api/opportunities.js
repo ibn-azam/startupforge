@@ -26,3 +26,13 @@ export const getOpportunitiesByFilter = async (filters = {}) => {
   const res = await fetch(`${baseUrl}/api/opportunities?${params.toString()}`);
   return res.json();
 };
+
+
+
+export async function getLatestOpportunities(limit = 3) {
+  const res = await fetch(
+    `${baseUrl}/opportunities/latest?limit=${limit}`
+  );
+  const data = await res.json();
+  return data;
+}
