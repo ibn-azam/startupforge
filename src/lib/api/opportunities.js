@@ -21,6 +21,10 @@ export const getOpportunitiesByFilter = async (filters = {}) => {
   if (filters.search) params.append("search", filters.search);
   if (filters.workType && filters.workType !== "All") params.append("workType", filters.workType);
   if (filters.industry && filters.industry !== "All") params.append("industry", filters.industry);
+  
+  // Pagination parameters
+  if (filters.page) params.append("page", filters.page);
+  if (filters.limit) params.append("limit", filters.limit);
 
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "";
   const res = await fetch(`${baseUrl}/api/opportunities?${params.toString()}`);
