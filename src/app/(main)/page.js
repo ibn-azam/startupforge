@@ -1,5 +1,7 @@
 import FeaturedOpportunities from "@/components/FeaturedOpportunities/FeaturedOpportunities";
 import Hero from "@/components/Hero";
+import SuccessStories from "@/components/SuccessStories";
+import WhyJoinStartupForge from "@/components/WhyJoinStartupForge";
 
 
 export default function Home() {
@@ -7,6 +9,8 @@ export default function Home() {
     <div className="min-h-screen">
      <Hero/>
      <FeaturedOpportunities/>
+     <SuccessStories/>
+     <WhyJoinStartupForge/>
     </div>
   );
 }
