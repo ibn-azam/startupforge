@@ -3,13 +3,7 @@
 import React from "react";
 import StatCard from "./StatCard";
 
-/**
- * Dynamic Stats Grid Component
- *
- * @param {Object} props
- * @param {Array} props.stats - Array of stat objects
- * @param {string} [props.className] - Custom grid container classes
- */
+
 export default function DashboardStats({ stats = [], className = "" }) {
   if (!stats || stats.length === 0) return null;
 

@@ -16,6 +16,7 @@ import {
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { uploadImageToImgbb } from "@/lib/actions/actions";
+import Image from "next/image";
 
 const SignUpPage = () => {
   const router = useRouter();
@@ -85,6 +86,8 @@ const SignUpPage = () => {
       email: userData.email,
       password: userData.password,
       role: userData.role,
+      isBlocked: false,
+      isPremium: false,
       callbackURL: "/login",
     });
 
@@ -133,7 +136,9 @@ const SignUpPage = () => {
             <div className="flex flex-col items-center gap-2">
               {uploadedImageUrl ? (
                 <>
-                  <img
+                  <Image
+                  width={80}
+                    height={80}
                     src={uploadedImageUrl}
                     alt="Uploaded profile"
                     className="h-24 w-24 rounded-full object-cover border border-[#6B7280]/20"
@@ -152,7 +157,9 @@ const SignUpPage = () => {
                 </div>
               ) : (
                 previewUrl && (
-                  <img
+                  <Image
+                    width={80}
+                    height={80}
                     src={previewUrl}
                     alt="Profile preview"
                     className="h-24 w-24 rounded-full object-cover border border-[#6B7280]/20"

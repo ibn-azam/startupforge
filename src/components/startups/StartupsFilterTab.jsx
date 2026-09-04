@@ -14,7 +14,7 @@ const industries = [
 
 const StartupsFilterTab = ({ activeIndustry, setActiveIndustry }) => {
     return (
-        <div className="flex flex-wrap gap-2 mb-6">
+        <div className="flex flex-wrap gap-2 lg:justify-center mb-6">
             {industries.map((item) => (
                 <button
                     key={item}
