@@ -2,9 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Button } from "@heroui/react";
+import { Button, Card, Spinner } from "@heroui/react";
 import { Calendar, ArrowLeft } from "@gravity-ui/icons";
 import { getOpportunityById } from "@/lib/api/opportunities";
+import { useSession } from "@/lib/auth-client";
+import { ApplyModal } from "@/components/collaborator/ApplyModal";
+
 
 const WORK_TYPE_STYLES = {
   Remote: "bg-emerald-50 text-emerald-700",
@@ -27,6 +30,8 @@ function formatDeadline(deadline) {
 }
 
 const OpportunityDetailsPage = () => {
+  const {data:session} = useSession();
+  const user = session?.user;
   const { id } = useParams();
   const router = useRouter();
   const [opportunity, setOpportunity] = useState(null);
@@ -42,11 +47,13 @@ const OpportunityDetailsPage = () => {
   }, [id]);
 
   if (loading)
-    return <div className="p-6 text-sm text-gray-500">Loading...</div>;
+    return <div className="flex items-center justify-center min-h-screen"><Spinner className="text-[#FF6B35]" size="lg" /></div>;
   if (!opportunity)
     return (
       <div className="p-6 text-sm text-gray-500">Opportunity not found.</div>
     );
+
+    
 
   const {
     roleTitle,
@@ -55,6 +62,8 @@ const OpportunityDetailsPage = () => {
     commitmentLevel,
     deadline,
   } = opportunity;
+
+  
 
   return (
     <div className="mx-auto max-w-3xl p-6">
@@ -130,11 +139,9 @@ const OpportunityDetailsPage = () => {
             </div>
           </div>
           {/* TODO: Implement apply functionality */}
-          <div>
-            <Button className="mt-8 w-full bg-[#131B3A] text-white">
-              Apply Now
-            </Button>
-          </div>
+          {user?.role === "collaborator" ?<ApplyModal opportunityId={opportunity._id} applicantEmail={user.email}/>: <Card>
+           <p className="text-[#131B3A]"> please login as a collaborator to apply for this opportunity.</p>
+            </Card>}
         </div>
       </div>
     </div>
