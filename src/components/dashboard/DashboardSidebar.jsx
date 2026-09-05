@@ -39,6 +39,11 @@ export function DashboardSidebar() {
       href: "/dashboard/founder/applications",
       label: "Applications",
     },
+    {
+      icon: Gear,
+      href: "/dashboard/founder/premium-success?session_id=cs_test_a10rB14LRzrqsFWSznkXeMZcQiT9dwMWvVNcWCHzqwFcF3JsDmreXs3jMp",
+      label: "Premium Success",
+    },
   ];
 
   const collaboratorNav = [
@@ -47,11 +52,6 @@ export function DashboardSidebar() {
       icon: Rocket,
       href: "/dashboard/collaborator/applications",
       label: "My Applications",
-    },
-    {
-      icon: CirclePlus,
-      href: "/dashboard/collaborator/opportunities",
-      label: "Browse Opportunities",
     },
     {
       icon: CirclePlus,

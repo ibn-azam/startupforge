@@ -15,6 +15,7 @@ import {
 import { uploadImageToImgbb } from "@/lib/actions/actions";
 import { toast } from "react-toastify";
 import { DeleteAlert } from "./DeleteAlert";
+import Image from "next/image";
 
 const emptyForm = (startup) => ({
   name: startup.name || "",
@@ -118,6 +119,7 @@ const StartupCard = ({ startup }) => {
       description: form.description.trim(),
       fundingStage: form.fundingStage.trim(),
       founderEmail: form.founderEmail.trim(),
+      status,
     };
 
     const isUnchanged =
@@ -126,7 +128,8 @@ const StartupCard = ({ startup }) => {
       payload.industry === (industry || "") &&
       payload.description === (description || "") &&
       payload.fundingStage === (fundingStage || "") &&
-      payload.founderEmail === (founderEmail || "");
+      payload.founderEmail === (founderEmail || "") &&
+      payload.status === (status || "");
 
     if (isUnchanged) {
       setIsEditing(false);
@@ -194,7 +197,9 @@ const StartupCard = ({ startup }) => {
         <div className="absolute -bottom-10 left-6">
           <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-2xl border-4 border-white bg-white shadow-md">
             {(isEditing ? form.logoUrl : logoUrl) ? (
-              <img
+              <Image
+              width={100}
+              height={100}
                 src={isEditing ? form.logoUrl : logoUrl}
                 alt={name || "Startup logo"}
                 className="h-full w-full object-cover"

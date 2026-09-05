@@ -119,10 +119,7 @@ export default function StartupsPage() {
 
         if (cancelled) return;
 
-        // API can return:
-        // []
-        // { startups: [] }
-        // { data: [] }
+       
         const list = Array.isArray(data)
           ? data
           : Array.isArray(data?.startups)
@@ -674,7 +671,7 @@ export default function StartupsPage() {
         {!loadingStartups && !showForm && hasStartups && (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
             {startups.map((startup) => (
-              <StartupCard
+              <StartupCard 
                 key={startup._id}
                 startup={startup}
               />

@@ -2,6 +2,16 @@
 
 import React from "react";
 import StatCard from "./StatCard";
+import {
+  Check,
+  FileText,
+  Hourglass,
+  Persons,
+  Thunderbolt,
+  Xmark,
+} from "@gravity-ui/icons";
+
+const icons = { Check, FileText, Hourglass, Persons, Thunderbolt, Xmark };
 
 
 export default function DashboardStats({ stats = [], className = "" }) {
@@ -16,7 +26,7 @@ export default function DashboardStats({ stats = [], className = "" }) {
           key={stat.id || index}
           title={stat.title}
           value={stat.value}
-          icon={stat.icon}
+          icon={icons[stat.icon]}
         />
       ))}
     </div>

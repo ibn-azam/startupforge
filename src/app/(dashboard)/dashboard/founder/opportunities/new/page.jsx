@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import {
@@ -17,6 +17,7 @@ import {
 import { toast } from "react-toastify";
 import { createOpportunity } from "@/lib/actions/startups";
 import { useSession } from "@/lib/auth-client";
+import { getFounderStartups } from "@/lib/api/startups";
 
 const WORK_TYPES = ["Remote", "Onsite", "Hybrid"];
 
@@ -27,7 +28,6 @@ const COMMITMENT_LEVELS = [
   "Internship",
   "Volunteer",
 ];
-const INDUSTRIES = ["Development", "Design", "Marketing", "Product", "Sales"];
 
 export default function AddOpportunityPage() {
   const router = useRouter();
@@ -38,10 +38,48 @@ export default function AddOpportunityPage() {
   const [requiredSkills, setRequiredSkills] = useState("");
   const [workType, setWorkType] = useState(null);
   const [commitmentLevel, setCommitmentLevel] = useState(null);
-  const [industry, setIndustry] = useState(null);
+  const [startup, setStartup] = useState(null);
   const [deadline, setDeadline] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadStartup = async () => {
+      const email = user?.email;
+
+      if (!email) {
+        if (!cancelled) setStartup(null);
+        return;
+      }
+
+      try {
+        const data = await getFounderStartups(email);
+        const startups = Array.isArray(data)
+          ? data
+          : Array.isArray(data?.startups)
+            ? data.startups
+            : Array.isArray(data?.data)
+              ? data.data
+              : [];
+
+        if (!cancelled) setStartup(startups[0] || null);
+      } catch (loadError) {
+        console.error("Failed to load startup:", loadError);
+        if (!cancelled) {
+          setStartup(null);
+          toast.error("Failed to load startup.");
+        }
+      }
+    };
+
+    loadStartup();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.email]);
 
   // -----------------------------
   // FORM SUBMIT
@@ -58,7 +96,7 @@ export default function AddOpportunityPage() {
       !requiredSkills.trim() ||
       !workType ||
       !commitmentLevel ||
-      !industry ||        
+      !startup?._id || 
       !deadline
     ) {
       setError("Please fill in all required fields.");
@@ -83,7 +121,8 @@ export default function AddOpportunityPage() {
           .filter(Boolean),
         workType: String(workType),
         commitmentLevel: String(commitmentLevel),
-        industry: String(industry),
+        startupId: startup._id,
+        industry: startup.industry,
         deadline,
         founderEmail: user.email,
       };
@@ -98,7 +137,6 @@ export default function AddOpportunityPage() {
         setRequiredSkills("");
         setWorkType(null);
         setCommitmentLevel(null);
-        setIndustry(null);
         setDeadline("");
 
         router.push("/dashboard/founder/opportunities");
@@ -223,31 +261,6 @@ export default function AddOpportunityPage() {
             </ListBox>
           </Select.Popover>
         </Select>
-
-        {/* INDUSTRY */}
-<Select
-  value={industry}
-  onChange={setIndustry}
-  placeholder="Select industry"
->
-  <Label>Industry</Label>
-
-  <Select.Trigger>
-    <Select.Value />
-    <Select.Indicator />
-  </Select.Trigger>
-
-  <Select.Popover>
-    <ListBox>
-      {INDUSTRIES.map((item) => (
-        <ListBox.Item key={item} id={item} textValue={item}>
-          {item}
-          <ListBox.ItemIndicator />
-        </ListBox.Item>
-      ))}
-    </ListBox>
-  </Select.Popover>
-</Select>
 
         {/* DEADLINE */}
         <TextField name="deadline" isRequired>

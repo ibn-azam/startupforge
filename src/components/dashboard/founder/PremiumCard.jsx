@@ -38,7 +38,7 @@ export default function PremiumCard({ isPremium }) {
         <>
           {/* --- State 1: Premium Member --- */}
 
-          <div className="px-5 py-6">
+          <div className="px-4 py-2">
             <CardTitle>
               <h3 className="text-xl font-bold tracking-tight text-[#131B3A]">
                 You&apos;re on Premium
@@ -66,7 +66,7 @@ export default function PremiumCard({ isPremium }) {
             </div>
           </div>
 
-          <CardFooter className="px-5 pb-5 pt-0">
+          {/* <CardFooter className="px-5 pb-5 pt-0">
             <Button
               fullWidth
               variant="bordered"
@@ -76,7 +76,7 @@ export default function PremiumCard({ isPremium }) {
             >
               Manage Subscription
             </Button>
-          </CardFooter>
+          </CardFooter> */}
         </>
       ) : (
         <>
