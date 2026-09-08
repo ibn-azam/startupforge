@@ -99,18 +99,18 @@ const AdminUsersPage = () => {
     };
 
     return (
-        <div className="flex min-h-full flex-col gap-8 p-6 lg:p-8">
+        <div className="flex min-h-full flex-col gap-6 p-4 sm:gap-8 sm:p-6 lg:p-8">
             <div>
-                <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#FF6B35]">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#FF6B35] sm:text-sm">
                     Platform access
                 </p>
-                <h1 className="mt-2 text-3xl font-bold text-[#131B3A]">Manage Users</h1>
+                <h1 className="mt-2 text-2xl font-bold text-[#131B3A] sm:text-3xl">Manage Users</h1>
                 <p className="mt-2 text-sm text-gray-500">
                     Review user accounts and control access to the platform.
                 </p>
             </div>
 
-            <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+            <div className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm sm:p-5">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                         <h2 className="text-lg font-semibold text-[#131B3A]">All Users</h2>
@@ -120,7 +120,7 @@ const AdminUsersPage = () => {
                     </div>
                     <Input
                         aria-label="Search users"
-                        className="sm:max-w-xs"
+                        className="w-full sm:max-w-xs"
                         placeholder="Search name, email, or role"
                         startContent={<Magnifier size={16} />}
                         value={search}
@@ -143,8 +143,55 @@ const AdminUsersPage = () => {
                         {search ? "No users match your search." : "No users found."}
                     </div>
                 ) : (
-                    <div className="mt-6 overflow-x-auto">
-                        <table className="w-full min-w-190 border-collapse text-left">
+                    <>
+                        <div className="mt-6 space-y-3 sm:hidden">
+                            {filteredUsers.map((user) => {
+                                const isCurrentUser = user.email === session?.user?.email;
+
+                                return (
+                                    <article
+                                        key={user._id}
+                                        className="rounded-xl border border-gray-100 bg-[#FAFAFA] p-4"
+                                    >
+                                        <div className="flex items-start justify-between gap-3">
+                                            <div className="min-w-0">
+                                                <p className="truncate font-semibold text-[#131B3A]">
+                                                    {user.name || "Unnamed user"}
+                                                </p>
+                                                <p className="mt-1 break-all text-sm text-gray-500">
+                                                    {user.email}
+                                                </p>
+                                            </div>
+                                            <span className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold capitalize ${roleStyles[user.role] || "bg-gray-100 text-gray-700"}`}>
+                                                {user.role || "user"}
+                                            </span>
+                                        </div>
+                                        <div className="mt-4 flex items-center justify-between gap-3 border-t border-gray-200 pt-3">
+                                            <div>
+                                                <p className="text-xs text-gray-500">Joined {formatDate(user.createdAt)}</p>
+                                                <span className={`mt-1 inline-flex items-center gap-1.5 text-sm font-medium ${user.isBlocked ? "text-red-600" : "text-emerald-600"}`}>
+                                                    {user.isBlocked ? <ShieldExclamation size={16} /> : <ShieldCheck size={16} />}
+                                                    {user.isBlocked ? "Blocked" : "Active"}
+                                                </span>
+                                            </div>
+                                            <Button
+                                                size="sm"
+                                                variant={user.isBlocked ? "flat" : "bordered"}
+                                                isDisabled={isCurrentUser || updatingId === user._id}
+                                                isLoading={updatingId === user._id}
+                                                className={user.isBlocked ? "bg-emerald-50 text-emerald-700" : "border-red-200 text-red-600"}
+                                                onPress={() => toggleBlocked(user)}
+                                            >
+                                                {user.isBlocked ? "Unblock" : "Block"}
+                                            </Button>
+                                        </div>
+                                    </article>
+                                );
+                            })}
+                        </div>
+
+                        <div className="mt-6 hidden overflow-x-auto sm:block">
+                        <table className="w-full min-w-160 border-collapse text-left">
                             <thead>
                                 <tr className="border-b border-gray-100 text-xs uppercase tracking-wide text-gray-400">
                                     <th className="px-4 py-3 font-semibold">User</th>
@@ -193,7 +240,8 @@ const AdminUsersPage = () => {
                                 })}
                             </tbody>
                         </table>
-                    </div>
+                        </div>
+                    </>
                 )}
             </div>
         </div>

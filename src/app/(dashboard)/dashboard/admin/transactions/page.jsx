@@ -27,18 +27,18 @@ const AdminTransactionsPage = async () => {
     }
 
     return (
-        <div className="flex min-h-full flex-col gap-8 p-6 lg:p-8">
+        <div className="flex min-h-full flex-col gap-6 p-4 sm:gap-8 sm:p-6 lg:p-8">
             <div>
-                <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#FF6B35]">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#FF6B35] sm:text-sm">
                     Billing activity
                 </p>
-                <h1 className="mt-2 text-3xl font-bold text-[#131B3A]">Transactions</h1>
+                <h1 className="mt-2 text-2xl font-bold text-[#131B3A] sm:text-3xl">Transactions</h1>
                 <p className="mt-2 text-sm text-gray-500">
                     Review premium subscription checkout activity from Stripe.
                 </p>
             </div>
 
-            <section className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+            <section className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm sm:p-5">
                 {error ? (
                     <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
                         {error}
@@ -48,8 +48,43 @@ const AdminTransactionsPage = async () => {
                         No transactions found.
                     </div>
                 ) : (
-                    <div className="overflow-x-auto">
-                        <table className="w-full min-w-190 border-collapse text-left">
+                    <>
+                        <div className="space-y-3 sm:hidden">
+                            {transactions.map((transaction) => (
+                                <article
+                                    key={transaction.id}
+                                    className="rounded-xl border border-gray-100 bg-[#FAFAFA] p-4"
+                                >
+                                    <div className="flex items-start justify-between gap-3">
+                                        <div className="min-w-0">
+                                            <p className="truncate text-sm font-semibold text-[#131B3A]">
+                                                {transaction.email}
+                                            </p>
+                                            <p className="mt-1 text-xs text-gray-500">
+                                                {formatDate(transaction.createdAt)}
+                                            </p>
+                                        </div>
+                                        <span className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold capitalize ${transaction.status === "paid" ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"}`}>
+                                            {transaction.status}
+                                        </span>
+                                    </div>
+                                    <div className="mt-4 flex items-end justify-between gap-3">
+                                        <div>
+                                            <p className="text-xs uppercase tracking-wide text-gray-400">Amount</p>
+                                            <p className="mt-1 text-lg font-semibold text-[#131B3A]">
+                                                {formatAmount(transaction.amount, transaction.currency)}
+                                            </p>
+                                        </div>
+                                        <p className="max-w-[55%] break-all text-right text-[11px] leading-4 text-gray-400">
+                                            {transaction.id}
+                                        </p>
+                                    </div>
+                                </article>
+                            ))}
+                        </div>
+
+                        <div className="hidden overflow-x-auto sm:block">
+                        <table className="w-full min-w-160 border-collapse text-left">
                             <thead>
                                 <tr className="border-b border-gray-100 text-xs uppercase tracking-wide text-gray-400">
                                     <th className="px-4 py-3 font-semibold">Customer</th>
@@ -83,7 +118,8 @@ const AdminTransactionsPage = async () => {
                                 ))}
                             </tbody>
                         </table>
-                    </div>
+                        </div>
+                    </>
                 )}
             </section>
         </div>

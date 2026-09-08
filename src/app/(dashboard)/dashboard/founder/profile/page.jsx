@@ -1,11 +1,7 @@
-import React from 'react';
+import ProfileSettings from "@/components/dashboard/ProfileSettings";
 
 const FounderProfilePage = () => {
-    return (
-        <div>
-            <h2>this is founder profile page</h2>
-        </div>
-    );
+    return <ProfileSettings />;
 };
 
 export default FounderProfilePage;

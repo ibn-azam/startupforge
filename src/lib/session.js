@@ -9,6 +9,8 @@ export const getUserSession = async () => {
     return session?.user || null;
 }
 
+
+
 export const roleValidator = async(role)=>{
     const user = await getUserSession();
     if(!user || user.role !== role){

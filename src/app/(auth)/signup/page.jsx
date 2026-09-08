@@ -17,6 +17,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { uploadImageToImgbb } from "@/lib/actions/actions";
 import Image from "next/image";
+import Link from "next/link";
 
 const SignUpPage = () => {
   const router = useRouter();
@@ -249,13 +250,12 @@ const SignUpPage = () => {
             >
               {isUploading ? "Uploading..." : "Create"}
             </Button>
-            <Button
-              type="reset"
-              variant="secondary"
-              className="w-full text-[#131B3A] font-semibold text-[16px]"
-            >
-              Reset
-            </Button>
+            <div className="text-center text-sm text-gray-500">
+                               <span>Already have an account?</span>{" "}
+                               <Link href="/login" className="font-semibold text-[#FF6B35] hover:underline">
+                                   Login
+                               </Link>
+                              </div>
           </div>
         </Form>
       </Card>

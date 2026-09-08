@@ -2,32 +2,53 @@
 import { authClient } from "@/lib/auth-client";
 import {Check} from "@gravity-ui/icons";
 import {Button, Card, Description, FieldError, Form, Input, Label, Radio, RadioGroup, TextField} from "@heroui/react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 
 const LogInPage = () => {
     const router = useRouter()
+
+    const getRedirectPath = () => {
+        const requestedPath = new URLSearchParams(window.location.search).get('callbackUrl')
+
+        if (!requestedPath || !requestedPath.startsWith('/') || requestedPath.startsWith('//')) {
+            return '/'
+        }
+
+        return requestedPath
+    }
+
     const onSubmit = async(e)=>{
         e.preventDefault();
         const formData = new FormData(e.currentTarget);
         const userData = Object.fromEntries(formData.entries());
+        const redirectPath = getRedirectPath();
         const {data,error} = await authClient.signIn.email({
             email : userData.email,
             password : userData.password,
-            callbackURL:'/',
+            callbackURL: redirectPath,
         });
-        
-        if(data){
+
+        if (data?.user?.isBlocked === true) {
+            await authClient.signOut();
+            toast.error('You are blocked');
+            return;
+        }
+
+        if (data) {
             toast.success('Login Successful! Welcome')
-        }if(error){
+            router.replace(redirectPath)
+        } else if (error) {
             toast.error('login failed')
         }
 
     }
 
     const handleGoogleSignIn = async () => {
-        const data = await authClient.signIn.social({
+        await authClient.signIn.social({
             provider: "google",
+            callbackURL: getRedirectPath(),
         });
     }
 
@@ -86,6 +107,12 @@ const LogInPage = () => {
                             Login
                         </Button>
                     </div>
+                   <div className="text-center text-sm text-gray-500">
+                    <span>Don&apos;t have an account?</span>{" "}
+                    <Link href="/signup" className="font-semibold text-[#FF6B35] hover:underline">
+                        Sign up
+                    </Link>
+                   </div>
                 </Form>
 
                 {/* Divider */}

@@ -1,11 +1,7 @@
-import React from 'react';
+import ProfileSettings from "@/components/dashboard/ProfileSettings";
 
 const CollaboratorProfilePage = () => {
-    return (
-        <div>
-            <h2>profiel</h2>
-        </div>
-    );
+    return <ProfileSettings />;
 };
 
 export default CollaboratorProfilePage;

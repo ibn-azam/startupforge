@@ -5,15 +5,15 @@ import Link from "next/link";
 const roleRoutes = {
   founder: {
     dashboard: "/dashboard/founder",
-    profile: "/profile/founder",
+    profile: "/dashboard/founder/profile",
   },
   collaborator: {
     dashboard: "/dashboard/collaborator",
-    profile: "/profile/collaborator",
+    profile: "/dashboard/collaborator/profile",
   },
   admin: {
     dashboard: "/dashboard/admin",
-    profile: "/profile/admin",
+    profile: "/dashboard/admin/profile",
   },
 };
 
@@ -39,8 +39,8 @@ export function ProfileDropdown({user}) {
             </Avatar>
 
             <div className="flex flex-col gap-0">
-              <p className="text-sm leading-5 font-medium">{user.name}</p>
-              <p className="text-xs leading-none text-muted">{user.email}</p>
+              <p className="text-sm leading-5 font-medium">{user.name || "User"}</p>
+              <p className="text-xs leading-none text-muted">{user.email || ""}</p>
             </div>
           </div>
         </div>

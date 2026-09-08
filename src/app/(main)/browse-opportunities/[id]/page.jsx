@@ -138,9 +138,9 @@ const OpportunityDetailsPage = () => {
               </p>
             </div>
           </div>
-          {/* TODO: Implement apply functionality */}
-          {user?.role === "collaborator" ?<ApplyModal opportunityId={opportunity._id} applicantEmail={user.email}/>: <Card>
-           <p className="text-[#131B3A]"> please login as a collaborator to apply for this opportunity.</p>
+          
+          {user?.role === "collaborator" ?<ApplyModal opportunityId={opportunity._id} applicantEmail={user.email}/>: <Card className="mt-4 shadow-sm">
+           <p className="text-[#FF6B35] text-center"> please login as a collaborator to apply for this opportunity.</p>
             </Card>}
         </div>
       </div>

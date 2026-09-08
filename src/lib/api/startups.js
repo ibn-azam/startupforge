@@ -16,3 +16,8 @@ export const getStartups = async (filters = {}) => {
   const res = await fetch(`${baseUrl}/api/startups?${params.toString()}`);
   return res.json();
 }
+
+export const getStartupById = async (id) => {
+    const res = await fetch(`${baseUrl}/api/startup/${id}`);
+    return res.json();
+}

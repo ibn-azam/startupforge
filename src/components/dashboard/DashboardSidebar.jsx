@@ -3,7 +3,6 @@
 import { authClient, useSession } from "@/lib/auth-client";
 import {
   LayoutSideContent,
-  Bell,
   Envelope,
   Gear,
   House,
@@ -38,6 +37,11 @@ export function DashboardSidebar() {
       icon: Envelope,
       href: "/dashboard/founder/applications",
       label: "Applications",
+    },
+    {
+      icon: Person,
+      href: "/dashboard/founder/profile",
+      label: "Profile",
     },
     {
       icon: Gear,
@@ -82,25 +86,35 @@ export function DashboardSidebar() {
         ? collaboratorNav
         : founderNav;
 
+  const activePath = navItems
+    .map((item) => item.href.split("?")[0])
+    .filter(
+      (itemPath) =>
+        pathname === itemPath ||
+        (itemPath !== `/dashboard/${role}` &&
+          pathname.startsWith(itemPath + "/")),
+    )
+    .sort((firstPath, secondPath) => secondPath.length - firstPath.length)[0];
+
   const navContent = (
     <nav className="flex flex-col gap-1">
       {navItems.map((item) => {
-        const isActive =
-          pathname === item.href ||
-          (item.href !== `/dashboard/${role}` &&
-            pathname.startsWith(item.href + "/"));
+        const itemPath = item.href.split("?")[0];
+        const isActive = itemPath === activePath;
 
         return (
           <Link
             href={item.href}
             key={item.label}
-            className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm  ${
+            className={`flex min-h-11 items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors ${
               isActive
                 ? "bg-[#FF6B35] text-[#FAFAFA]"
                 : "text-foreground hover:bg-default"
             }`}
           >
-            <item.icon className="size-5" />
+            <item.icon
+              className={`size-5 shrink-0 ${isActive ? "text-[#FAFAFA]" : "text-[#6B7280]"}`}
+            />
             {item.label}
           </Link>
         );
@@ -114,7 +128,7 @@ export function DashboardSidebar() {
 
   return (
     <>
-      <aside className="hidden w-64 shrink-0 border-r border-default p-4 lg:flex lg:flex-col lg:justify-between h-screen sticky top-0 bg-[#FAFAFA]">
+      <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col justify-between border-r border-default bg-[#FAFAFA] p-4 lg:flex">
         <div>
           {/* Logo */}
           <div className="my-2">
@@ -193,10 +207,11 @@ export function DashboardSidebar() {
           </Link>
         </div>
       </aside>
+     
       <Drawer className="bg-[#FAFAFA]">
         <Button
-          className="lg:hidden bg-[#FF6B35]
-      text-[#FAFAFA] mt-6 ml-2"
+          aria-label="Open dashboard navigation"
+          className="fixed right-4 top-3 z-20 bg-[#FF6B35] text-[#FAFAFA] shadow-sm lg:hidden"
           variant="secondary"
         >
           <LayoutSideContent />
@@ -215,8 +230,25 @@ export function DashboardSidebar() {
                   </Link>
                 </Drawer.Heading>
               </Drawer.Header>
-              <Drawer.Body>
-                <div>{navContent}</div>
+              <Drawer.Body className="flex flex-col gap-6">
+                {navContent}
+                <div className="flex flex-col gap-1 border-t border-[#6B7280]/20 pt-3">
+                  <Link
+                    href="/"
+                    className="flex min-h-11 items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-foreground hover:bg-default"
+                  >
+                    <House className="size-5 text-[#6B7280]" />
+                    Back To Home
+                  </Link>
+                  <Link
+                    onClick={handleSignOut}
+                    href="/login"
+                    className="flex min-h-11 items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-red-600 hover:bg-red-50"
+                  >
+                    <Person className="size-5" />
+                    Sign Out
+                  </Link>
+                </div>
               </Drawer.Body>
             </Drawer.Dialog>
           </Drawer.Content>

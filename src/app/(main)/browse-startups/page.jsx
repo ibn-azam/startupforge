@@ -10,15 +10,21 @@ const BrowseStartupsPage = () => {
     const [startups, setStartups] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [activeIndustry, setActiveIndustry] = useState('All');
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         const timeout = setTimeout(() => {
             const fetchData = async () => {
-                const data = await getStartups({
-                    search: searchTerm,
-                    industry: activeIndustry,
-                });
-                setStartups(data);
+                setIsLoading(true);
+                try {
+                    const data = await getStartups({
+                        search: searchTerm,
+                        industry: activeIndustry,
+                    });
+                    setStartups(data);
+                } finally {
+                    setIsLoading(false);
+                }
             };
             fetchData();
         }, 300);
@@ -48,11 +54,16 @@ const BrowseStartupsPage = () => {
                 setActiveIndustry={setActiveIndustry}
             />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 py-4">
-                {startups.map((startup) => (
+            <div className="grid min-h-[300px] grid-cols-1 gap-4 py-4 md:grid-cols-2 lg:grid-cols-3">
+                {isLoading ? (
+                    <div className="col-span-full flex items-center justify-center p-20">
+                        <p className="text-lg text-slate-400">Loading startups...</p>
+                    </div>
+                ) : startups.length > 0 ? (
+                    startups.map((startup) => (
                     <BrowseStartupCard key={startup._id} startup={startup} />
-                ))}
-                {startups.length === 0 && (
+                    ))
+                ) : (
                     <div className="col-span-full flex items-center justify-center p-20 border border-gray-200 rounded-lg bg-white shadow-sm">
                         <p className="text-slate-400 text-lg text-center">
                             No startups match your search.
