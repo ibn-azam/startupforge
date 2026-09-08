@@ -1,4 +1,5 @@
 import { stripe } from "@/lib/stripe";
+import { getAuthToken } from "@/lib/session";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Check, CrownDiamond } from "@gravity-ui/icons";
@@ -31,6 +32,34 @@ export default async function Success({ searchParams }) {
     },
   });
   const data = await res.json();
+
+  // Persist transaction data to MongoDB
+  const token = await getAuthToken();
+
+  const amount = session.amount_total;
+  const transaction_id = session.payment_intent ?? session.id;
+  const payment_status = session.payment_status;
+  const paid_at = new Date().toISOString();
+
+  const paymentRes = await fetch(`${baseUrl}/api/payments`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify({
+      user_email: email,
+      amount,
+      transaction_id,
+      payment_status,
+      paid_at,
+    }),
+  });
+
+  if (!paymentRes.ok) {
+    console.error("Failed to save payment:", paymentRes.status, await paymentRes.text());
+  }
+
   return (
     <div
       id="success"
@@ -89,8 +118,8 @@ export default async function Success({ searchParams }) {
               {/* Support */}
               <p className="mt-5 text-xs leading-5 text-[#131B3A]/50">
                 Need help? Contact us at{" "}
-                <a
-                  href="mailto:orders@example.com"
+                
+                 <a href="mailto:orders@example.com"
                   className="font-medium text-[#FF6B35] transition-colors hover:text-[#ff5a1e] hover:underline"
                 >
                   orders@example.com

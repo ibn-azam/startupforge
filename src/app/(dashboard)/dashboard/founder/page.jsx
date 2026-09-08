@@ -6,14 +6,17 @@ import { getUserSession } from "@/lib/session";
 import { getFounderOpportunities } from "@/lib/api/opportunities";
 import { getFounderApplications } from "@/lib/actions/application";
 
-const toList = (data, key) =>
-  Array.isArray(data)
-    ? data
-    : Array.isArray(data?.[key])
-      ? data[key]
-      : Array.isArray(data?.data)
-        ? data.data
-        : [];
+const toList = (data, key) => {
+  if (Array.isArray(data)) return data;
+  if (!data || typeof data !== "object") return [];
+
+  if (Array.isArray(data[key])) return data[key];
+  if (Array.isArray(data.data)) return data.data;
+  if (Array.isArray(data.data?.[key])) return data.data[key];
+  if (Array.isArray(data.result?.[key])) return data.result[key];
+
+  return [];
+};
 
 const FounderDashboardPage = async () => {
   const user = await getUserSession();
