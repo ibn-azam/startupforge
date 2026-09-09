@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getUserSession } from "@/lib/session";
+import { getUserSession, getAuthToken } from "@/lib/session";
 import {
   approveAdminStartup,
   getAdminStartups,
@@ -17,7 +17,7 @@ export async function GET() {
       return NextResponse.json({ message: "Unauthorized" }, { status: 403 });
     }
 
-    return NextResponse.json({ startups: await getAdminStartups() });
+    return NextResponse.json({ startups: await getAdminStartups(await getAuthToken()) });
   } catch (error) {
     console.error("Failed to load admin startups:", error);
     return NextResponse.json(
@@ -43,7 +43,7 @@ export async function PATCH(request) {
       return NextResponse.json({ message: "startupId is required." }, { status: 400 });
     }
 
-    return NextResponse.json({ startup: await approveAdminStartup(startupId) });
+    return NextResponse.json({ startup: await approveAdminStartup(startupId, await getAuthToken()) });
   } catch (error) {
     console.error("Failed to approve startup:", error);
     return NextResponse.json(
@@ -64,7 +64,7 @@ export async function DELETE(request) {
       return NextResponse.json({ message: "startupId is required." }, { status: 400 });
     }
 
-    return NextResponse.json({ startup: await removeAdminStartup(startupId) });
+    return NextResponse.json({ startup: await removeAdminStartup(startupId, await getAuthToken()) });
   } catch (error) {
     console.error("Failed to remove startup:", error);
     return NextResponse.json(

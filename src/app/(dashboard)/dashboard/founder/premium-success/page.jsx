@@ -1,10 +1,11 @@
 import { stripe } from "@/lib/stripe";
-import { getAuthToken } from "@/lib/session";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Check, CrownDiamond } from "@gravity-ui/icons";
 import { Card } from "@heroui/react";
 import { RiH4 } from "react-icons/ri";
+import { getUserSession } from "@/lib/session";
+import { getAuthToken } from "@/lib/session";
 
 export default async function Success({ searchParams }) {
   const { session_id } = await searchParams;
@@ -21,44 +22,57 @@ export default async function Success({ searchParams }) {
   if (session.status === "open") {
     redirect("/");
   }
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
   const email = session.customer_details?.email;
+  const user = await getUserSession();
 
-  const res = await fetch(`${baseUrl}/api/user/${email}`, {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-  const data = await res.json();
+  if (session.payment_status !== "paid" || !email || user?.email !== email) {
+    redirect("/unauthorized");
+  }
 
-  // Persist transaction data to MongoDB
   const token = await getAuthToken();
 
-  const amount = session.amount_total;
-  const transaction_id = session.payment_intent ?? session.id;
-  const payment_status = session.payment_status;
-  const paid_at = new Date().toISOString();
-
-  const paymentRes = await fetch(`${baseUrl}/api/payments`, {
+  // =========================
+  // RECORD PAYMENT FIRST
+  // =========================
+  const paymentResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/payments`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({
       user_email: email,
-      amount,
-      transaction_id,
-      payment_status,
-      paid_at,
+      amount: session.amount_total,
+      transaction_id: session.id,
+      payment_status: session.payment_status,
+      paid_at: new Date(session.created * 1000).toISOString(),
     }),
+    cache: "no-store",
   });
 
-  if (!paymentRes.ok) {
-    console.error("Failed to save payment:", paymentRes.status, await paymentRes.text());
+  if (!paymentResponse.ok) {
+    throw new Error("Unable to record the verified payment.");
   }
+
+  // =========================
+  // UPDATE USER isPremium
+  // =========================
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/user/${email}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ isPremium: true }),
+    cache: "no-store",
+  });
+
+  if (!res.ok) {
+    throw new Error("Unable to update premium status.");
+  }
+
+  const data = await res.json();
 
   return (
     <div
@@ -118,8 +132,8 @@ export default async function Success({ searchParams }) {
               {/* Support */}
               <p className="mt-5 text-xs leading-5 text-[#131B3A]/50">
                 Need help? Contact us at{" "}
-                
-                 <a href="mailto:orders@example.com"
+                <a
+                  href="mailto:orders@example.com"
                   className="font-medium text-[#FF6B35] transition-colors hover:text-[#ff5a1e] hover:underline"
                 >
                   orders@example.com

@@ -64,7 +64,7 @@ const StartupCard = ({ startup }) => {
         throw new Error(data?.message || `Request failed with status ${response.status}`);
       }
       toast.success('Startup Deleted Successfully')
-      window.location.reload();
+      router.refresh();
     } catch (error) {
       toast.error(error.message || "Something went wrong while deleting the startup.");
     } finally {
@@ -156,7 +156,7 @@ const StartupCard = ({ startup }) => {
 
       setIsEditing(false);
       toast.success('Startup Updated Successfully')
-      window.location.reload();
+      router.refresh();
     } catch (error) {
       console.error("Edit error:", error);
       alert(error.message || "Something went wrong while updating the startup.");
@@ -389,7 +389,11 @@ const StartupCard = ({ startup }) => {
                 Edit
               </Button>
 
-             <DeleteAlert isDeleting={isDeleting}  handleDelete={handleDelete} startup={startup}/>
+             <DeleteAlert
+               isDeleting={isDeleting}
+               handleDelete={handleDelete}
+               name={startup.name || "this startup"}
+             />
             </>
           )}
         </div>

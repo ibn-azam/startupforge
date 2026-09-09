@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getUserSession } from "@/lib/session";
+import { getUserSession, getAuthToken } from "@/lib/session";
 import { getAdminUsers, setAdminUserBlocked } from "@/lib/api/admin";
 
 async function requireAdmin() {
@@ -18,7 +18,7 @@ export async function GET() {
       return NextResponse.json({ message: "Unauthorized" }, { status: 403 });
     }
 
-    return NextResponse.json({ users: await getAdminUsers() });
+    return NextResponse.json({ users: await getAdminUsers(await getAuthToken()) });
   } catch (error) {
     console.error("Failed to load admin users:", error);
     return NextResponse.json(
@@ -43,7 +43,7 @@ export async function PATCH(request) {
       );
     }
 
-    const user = await setAdminUserBlocked(userId, isBlocked);
+    const user = await setAdminUserBlocked(userId, isBlocked, await getAuthToken());
     return NextResponse.json({ user });
   } catch (error) {
     console.error("Failed to update user block status:", error);

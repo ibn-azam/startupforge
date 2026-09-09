@@ -26,7 +26,7 @@ export function ApplyModal({opportunityId, applicantEmail}) {
 
   useEffect(() => {
     if (!opportunityId || !applicantEmail) {
-      setChecking(false);
+      Promise.resolve().then(() => setChecking(false));
       return;
     }       
 
@@ -83,49 +83,40 @@ export function ApplyModal({opportunityId, applicantEmail}) {
         {hasApplied ? "Applied" : "Apply Now"}
       </Button>
 
-      <Modal.Backdrop className="bg-black/50 p-4">
+      <Modal.Backdrop className="bg-[#131B3A]/40 p-4 backdrop-blur-sm">
         <Modal.Container placement="center">
-          <Modal.Dialog className="w-full max-w-lg overflow-hidden rounded-2xl">
-            <Modal.CloseTrigger />
+          <Modal.Dialog className="w-full max-w-lg overflow-hidden rounded-2xl border border-[#6B7280]/10 bg-white shadow-xl">
+            <Modal.CloseTrigger className="text-[#6B7280] hover:text-[#131B3A]" />
 
-            <Modal.Header className="border-b border-default-200 px-6 py-4">
-              <Modal.Heading className="text-xl font-semibold">
+            <Modal.Header className="border-b border-[#6B7280]/10 bg-[#FAFAFA] px-6 py-5">
+              <Modal.Heading className="font-space-grotesk text-xl font-bold text-[#131B3A]">
                 Apply to Opportunity
               </Modal.Heading>
 
-              <p className="text-sm leading-5 text-muted">
+              <p className="mt-1 text-sm leading-5 text-[#6B7280]">
                 Fill out the form below to submit your application.
               </p>
             </Modal.Header>
 
             <form onSubmit={handleSubmit}>
-              <Modal.Body className="max-h-[70vh] overflow-y-auto px-6 py-3">
+              <Modal.Body className="max-h-[70vh] overflow-y-auto px-6 py-5">
+                {/* Applying-as summary, replaces editable-looking read-only fields */}
+                <div className="mb-5 flex items-center gap-3 rounded-xl border border-[#6B7280]/10 bg-[#FAFAFA] px-4 py-3">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#131B3A]/5">
+                    <Envelope className="h-4 w-4 text-[#131B3A]" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-[#6B7280]">
+                      Applying as
+                    </p>
+                    <p className="truncate text-sm font-medium text-[#131B3A]">
+                      {applicantEmail || "Not available"}
+                    </p>
+                  </div>
+                </div>
+
                 <Surface variant="default" className="rounded-xl">
                   <div className="flex flex-col gap-5">
-                    <TextField
-                      className="w-full"
-                      name="opportunityId"
-                      type="text"
-                      variant="secondary"
-                      isReadOnly
-                      value={opportunityId ?? ""}
-                    >
-                      <Label>Opportunity ID</Label>
-                      <Input />
-                    </TextField>
-
-                    <TextField
-                      className="w-full"
-                      name="applicantEmail"
-                      type="email"
-                      variant="secondary"
-                      isReadOnly
-                      value={applicantEmail ?? ""}
-                    >
-                      <Label>Applicant Email</Label>
-                      <Input />
-                    </TextField>
-
                     <TextField
                       className="w-full"
                       name="portfolioLink"
@@ -135,8 +126,13 @@ export function ApplyModal({opportunityId, applicantEmail}) {
                       value={portfolioLink}
                       onChange={setPortfolioLink}
                     >
-                      <Label>Portfolio Link</Label>
-                      <Input placeholder="https://your-portfolio.com" />
+                      <Label className="text-sm font-medium text-[#131B3A]">
+                        Portfolio Link
+                      </Label>
+                      <Input
+                        placeholder="https://your-portfolio.com"
+                        className="focus:border-[#FF6B35] focus:ring-[#FF6B35]/20"
+                      />
                     </TextField>
 
                     <TextField
@@ -147,9 +143,11 @@ export function ApplyModal({opportunityId, applicantEmail}) {
                       value={motivationMessage}
                       onChange={setMotivationMessage}
                     >
-                      <Label>Motivation Message</Label>
+                      <Label className="text-sm font-medium text-[#131B3A]">
+                        Motivation Message
+                      </Label>
                       <TextArea
-                        className="min-h-20 resize-none"
+                        className="min-h-20 resize-none focus:border-[#FF6B35] focus:ring-[#FF6B35]/20"
                         placeholder="Why are you a good fit for this role?"
                       />
                     </TextField>
@@ -157,9 +155,18 @@ export function ApplyModal({opportunityId, applicantEmail}) {
                 </Surface>
               </Modal.Body>
 
-              <Modal.Footer className="border-t border-default-200 px-6 py-2">
+              <Modal.Footer className="flex gap-3 border-t border-[#6B7280]/10 bg-[#FAFAFA] px-6 py-4">
                 <Button
-                  className="w-full my-2 bg-[#131B3A] font-medium text-white hover:bg-[#0b1125]"
+                  type="button"
+                  onPress={() => setIsOpen(false)}
+                  isDisabled={submitting}
+                  className="flex-1 border border-[#6B7280]/20 bg-white font-medium text-[#131B3A]"
+                >
+                  Cancel
+                </Button>
+
+                <Button
+                  className="flex-1 bg-[#FF6B35] font-medium text-white hover:bg-[#e55a2b] disabled:cursor-not-allowed disabled:opacity-60"
                   type="submit"
                   isDisabled={submitting}
                 >

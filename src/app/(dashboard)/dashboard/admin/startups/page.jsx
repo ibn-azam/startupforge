@@ -2,7 +2,13 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Button, Input, Spinner } from "@heroui/react";
-import { Check, Magnifier, TrashBin } from "@gravity-ui/icons";
+import { Check, Magnifier } from "@gravity-ui/icons";
+import { DeleteAlert } from "@/components/dashboard/founder/DeleteAlert";
+import {
+    getAdminStartups,
+    approveAdminStartup,
+    removeAdminStartup,
+} from "@/lib/api/admin";
 
 const statusStyles = {
     active: "bg-emerald-50 text-emerald-700",
@@ -19,14 +25,8 @@ const AdminStartupsPage = () => {
     useEffect(() => {
         const loadStartups = async () => {
             try {
-                const response = await fetch("/api/admin/startups");
-                const data = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(data.message || "Failed to load startups.");
-                }
-
-                setStartups(data.startups || []);
+                const data = await getAdminStartups();
+                setStartups(Array.isArray(data) ? data : data.startups || []);
             } catch (loadError) {
                 setError(loadError.message || "Failed to load startups.");
             } finally {
@@ -54,16 +54,7 @@ const AdminStartupsPage = () => {
         setError("");
 
         try {
-            const response = await fetch("/api/admin/startups", {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ startupId }),
-            });
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.message || "Failed to approve startup.");
-            }
+            await approveAdminStartup(startupId);
 
             setStartups((currentStartups) =>
                 currentStartups.map((startup) =>
@@ -78,22 +69,11 @@ const AdminStartupsPage = () => {
     };
 
     const removeStartup = async (startup) => {
-        if (!window.confirm(`Remove ${startup.name || "this startup"}?`)) return;
-
         setUpdatingId(startup._id);
         setError("");
 
         try {
-            const response = await fetch("/api/admin/startups", {
-                method: "DELETE",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ startupId: startup._id }),
-            });
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.message || "Failed to remove startup.");
-            }
+            await removeAdminStartup(startup._id);
 
             setStartups((currentStartups) =>
                 currentStartups.filter((currentStartup) => currentStartup._id !== startup._id),
@@ -192,17 +172,11 @@ const AdminStartupsPage = () => {
                                         >
                                             {isApproved ? "Approved" : "Approve"}
                                         </Button>
-                                        <Button
-                                            size="sm"
-                                            variant="bordered"
-                                            className="border-red-200 text-red-600"
-                                            isDisabled={isUpdating}
-                                            isLoading={isUpdating}
-                                            startContent={!isUpdating && <TrashBin size={16} />}
-                                            onPress={() => removeStartup(startup)}
-                                        >
-                                            Remove
-                                        </Button>
+                                        <DeleteAlert
+                                            name={startup.name || "this startup"}
+                                            isDeleting={isUpdating}
+                                            handleDelete={() => removeStartup(startup)}
+                                        />
                                     </div>
                                 </article>
                             );

@@ -1,42 +1,24 @@
 import DashboardStats from "@/components/dashboard/founder/DashboardStats";
 import {
     getAdminStartups,
-    getAdminUserStats,
     getAdminUsers,
+    getAdminUserStats,
 } from "@/lib/api/admin";
+import { getAuthToken } from "@/lib/session";
 
-/**
- * Safely convert different API response formats into an array.
- *
- * Supports:
- * - [...]
- * - { users: [...] }
- * - { startups: [...] }
- * - { data: [...] }
- */
+export const dynamic = "force-dynamic";
+
 const toList = (data, key) => {
-    if (Array.isArray(data)) {
-        return data;
-    }
-
-    if (Array.isArray(data?.[key])) {
-        return data[key];
-    }
-
-    if (Array.isArray(data?.data)) {
-        return data.data;
-    }
+    if (Array.isArray(data)) return data;
+    if (Array.isArray(data?.[key])) return data[key];
+    if (Array.isArray(data?.data)) return data.data;
+    if (Array.isArray(data?.result)) return data.result;
 
     return [];
 };
 
-/**
- * Safely format a date.
- */
 const formatDate = (value) => {
-    if (!value) {
-        return "Recently added";
-    }
+    if (!value) return "Recently added";
 
     const date = new Date(value);
 
@@ -51,186 +33,111 @@ const formatDate = (value) => {
     });
 };
 
-/**
- * Safely get an ID for React keys.
- */
 const getId = (item, index) => {
     return item?._id || item?.id || `item-${index}`;
 };
 
-/**
- * Safely convert a value to a number.
- */
-const toNumber = (value, fallback = 0) => {
-    const number = Number(value);
+const formatCurrency = (val) => {
+    const num = Number(val);
+    if (!Number.isFinite(num)) return "$0.00";
 
-    return Number.isFinite(number) ? number : fallback;
+    return `$${(num / 100).toLocaleString("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    })}`;
 };
 
 const AdminDashboardPage = async () => {
-    /**
-     * Fetch everything independently.
-     *
-     * Promise.allSettled prevents one failed API request
-     * from breaking the entire admin dashboard.
-     */
+    const token = await getAuthToken();
+
     const [userStatsResult, usersResult, startupsResult] =
         await Promise.allSettled([
-            getAdminUserStats(),
-            getAdminUsers(),
-            getAdminStartups(),
+            getAdminUserStats(token),
+            getAdminUsers(token),
+            getAdminStartups(token),
         ]);
 
-    /**
-     * ---------------------------------------
-     * USER STATS
-     * ---------------------------------------
-     */
-
-    let userStats = {
-        totalUsers: 0,
-        premiumUsers: 0,
-        collaborators: 0,
-    };
-
-    if (userStatsResult.status === "fulfilled") {
-        const response = userStatsResult.value;
-
-        userStats = {
-            totalUsers: toNumber(
-                response?.totalUsers ??
-                    response?.total ??
-                    response?.data?.totalUsers,
-                0
-            ),
-
-            premiumUsers: toNumber(
-                response?.premiumUsers ??
-                    response?.data?.premiumUsers,
-                0
-            ),
-
-            collaborators: toNumber(
-                response?.collaborators ??
-                    response?.data?.collaborators,
-                0
-            ),
-        };
-    } else {
-        console.error(
-            "Failed to load admin user stats:",
-            userStatsResult.reason
-        );
-    }
-
-    /**
-     * ---------------------------------------
-     * STARTUPS
-     * ---------------------------------------
-     */
-
     let startups = [];
-
     if (startupsResult.status === "fulfilled") {
         startups = toList(startupsResult.value, "startups");
-    } else {
-        console.error(
-            "Failed to load admin startups:",
-            startupsResult.reason
-        );
     }
-
-    /**
-     * ---------------------------------------
-     * USERS
-     * ---------------------------------------
-     */
 
     let users = [];
-
     if (usersResult.status === "fulfilled") {
         users = toList(usersResult.value, "users");
-    } else {
-        console.error(
-            "Failed to load admin users:",
-            usersResult.reason
-        );
     }
 
-    /**
-     * ---------------------------------------
-     * RECENT STARTUPS
-     * ---------------------------------------
-     */
+    let rawStats = {};
+    if (userStatsResult.status === "fulfilled") {
+        const res = userStatsResult.value;
+        rawStats = res?.data || res?.stats || res || {};
+    }
+
+    const totalRevenue = rawStats?.totalRevenue ?? 0;
+    const totalUsers = rawStats?.totalUsers ?? users.length;
+    const premiumUsers = rawStats?.premiumUsers ?? 0;
+    const collaborators = rawStats?.collaborators ?? 0;
+    const totalStartups = startups.length;
 
     const recentStartups = [...startups]
-        .sort((first, second) => {
-            const firstDate = new Date(first?.createdAt || 0).getTime();
-            const secondDate = new Date(second?.createdAt || 0).getTime();
-
-            return secondDate - firstDate;
-        })
+        .sort((a, b) => new Date(b?.createdAt || 0) - new Date(a?.createdAt || 0))
         .slice(0, 4);
-
-    /**
-     * ---------------------------------------
-     * RECENT USERS
-     * ---------------------------------------
-     */
 
     const recentUsers = [...users]
-        .sort((first, second) => {
-            const firstDate = new Date(first?.createdAt || 0).getTime();
-            const secondDate = new Date(second?.createdAt || 0).getTime();
-
-            return secondDate - firstDate;
-        })
+        .sort((a, b) => new Date(b?.createdAt || 0) - new Date(a?.createdAt || 0))
         .slice(0, 4);
-
-    /**
-     * ---------------------------------------
-     * DASHBOARD STATS
-     * ---------------------------------------
-     */
 
     const stats = [
         {
             title: "Total Users",
-            value: userStats.totalUsers,
+            label: "Total Users",
+            name: "Total Users",
+            value: totalUsers,
+            count: totalUsers,
+            number: totalUsers,
             icon: "Persons",
         },
         {
             title: "Total Startups",
-            value: startups.length,
+            label: "Total Startups",
+            name: "Total Startups",
+            value: totalStartups,
+            count: totalStartups,
+            number: totalStartups,
             icon: "FileText",
         },
         {
             title: "Collaborators",
-            value: userStats.collaborators,
+            label: "Collaborators",
+            name: "Collaborators",
+            value: collaborators,
+            count: collaborators,
+            number: collaborators,
             icon: "Persons",
         },
         {
             title: "Premium Members",
-            value: userStats.premiumUsers,
+            label: "Premium Members",
+            name: "Premium Members",
+            value: premiumUsers,
+            count: premiumUsers,
+            number: premiumUsers,
             icon: "Check",
+        },
+        {
+            title: "Total Revenue",
+            label: "Total Revenue",
+            name: "Total Revenue",
+            value: formatCurrency(totalRevenue),
+            icon: "Thunderbolt",
         },
     ];
 
-    /**
-     * Check whether the users API failed.
-     * This allows us to show a useful message instead of
-     * incorrectly saying that there are simply zero users.
-     */
     const usersApiFailed = usersResult.status === "rejected";
-
     const startupsApiFailed = startupsResult.status === "rejected";
 
     return (
         <div className="flex min-h-full flex-col gap-8 p-6 lg:p-8">
-            {/* --------------------------------------- */}
-            {/* HEADER */}
-            {/* --------------------------------------- */}
-
             <div>
                 <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#FF6B35]">
                     Control center
@@ -245,36 +152,19 @@ const AdminDashboardPage = async () => {
                 </p>
             </div>
 
-            {/* --------------------------------------- */}
-            {/* STATS */}
-            {/* --------------------------------------- */}
-
-            <DashboardStats
-                stats={stats}
-                className="lg:grid-cols-4"
-            />
-
-            {/* --------------------------------------- */}
-            {/* RECENT DATA */}
-            {/* --------------------------------------- */}
+            <DashboardStats stats={stats} className="lg:grid-cols-4" />
 
             <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-                {/* --------------------------------------- */}
-                {/* RECENT STARTUPS */}
-                {/* --------------------------------------- */}
-
                 <section className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
                     <div className="mb-5 flex items-center justify-between gap-4">
                         <div className="min-w-0">
                             <h2 className="text-lg font-semibold text-[#131B3A]">
                                 Recent Startups
                             </h2>
-
                             <p className="mt-1 text-sm text-gray-500">
                                 Latest startups added to the platform.
                             </p>
                         </div>
-
                         <span className="shrink-0 rounded-full bg-[#FFF1EB] px-3 py-1 text-xs font-semibold text-[#FF6B35]">
                             {startups.length} total
                         </span>
@@ -284,10 +174,6 @@ const AdminDashboardPage = async () => {
                         <div className="rounded-xl border border-red-100 bg-red-50 p-4">
                             <p className="text-sm font-medium text-red-700">
                                 Unable to load startups.
-                            </p>
-
-                            <p className="mt-1 text-xs text-red-500">
-                                Please check the startups API.
                             </p>
                         </div>
                     ) : (
@@ -300,16 +186,12 @@ const AdminDashboardPage = async () => {
                                     >
                                         <div className="min-w-0">
                                             <p className="truncate font-semibold text-[#131B3A]">
-                                                {startup?.name ||
-                                                    "Unnamed startup"}
+                                                {startup?.name || "Unnamed startup"}
                                             </p>
-
                                             <p className="mt-1 truncate text-xs text-gray-500">
-                                                {startup?.industry ||
-                                                    "Industry not specified"}
+                                                {startup?.industry || "Industry not specified"}
                                             </p>
                                         </div>
-
                                         <span className="shrink-0 text-xs text-gray-400">
                                             {formatDate(startup?.createdAt)}
                                         </span>
@@ -324,36 +206,22 @@ const AdminDashboardPage = async () => {
                     )}
                 </section>
 
-                {/* --------------------------------------- */}
-                {/* RECENT USERS */}
-                {/* --------------------------------------- */}
-
                 <section className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
                     <div className="mb-5 flex items-center justify-between gap-4">
                         <div className="min-w-0">
                             <h2 className="text-lg font-semibold text-[#131B3A]">
                                 Recent Users
                             </h2>
-
                             <p className="mt-1 text-sm text-gray-500">
                                 Latest accounts registered on the platform.
                             </p>
                         </div>
-
-                        <span className="shrink-0 rounded-full bg-[#131B3A]/5 px-3 py-1 text-xs font-semibold text-[#131B3A]">
-                            {users.length} total
-                        </span>
                     </div>
 
                     {usersApiFailed ? (
                         <div className="rounded-xl border border-red-100 bg-red-50 p-4">
                             <p className="text-sm font-medium text-red-700">
                                 Unable to load users.
-                            </p>
-
-                            <p className="mt-1 text-xs text-red-500">
-                                The users API returned an error. Check the
-                                server terminal for the actual error.
                             </p>
                         </div>
                     ) : (
@@ -366,22 +234,16 @@ const AdminDashboardPage = async () => {
                                     >
                                         <div className="min-w-0">
                                             <p className="truncate font-semibold text-[#131B3A]">
-                                                {user?.name ||
-                                                    "Unnamed user"}
+                                                {user?.name || "Unnamed user"}
                                             </p>
-
                                             <p className="mt-1 truncate text-xs text-gray-500">
-                                                {user?.email ||
-                                                    "Email not available"}
-
+                                                {user?.email || "Email not available"}
                                                 {" · "}
-
                                                 <span className="capitalize">
                                                     {user?.role || "user"}
                                                 </span>
                                             </p>
                                         </div>
-
                                         <span className="shrink-0 text-xs text-gray-400">
                                             {formatDate(user?.createdAt)}
                                         </span>

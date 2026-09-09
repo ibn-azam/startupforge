@@ -3,7 +3,9 @@
 import { TrashBin } from "@gravity-ui/icons";
 import {AlertDialog, Button} from "@heroui/react";
 
-export function DeleteAlert({handleDelete,isDeleting,startup}) {
+export function DeleteAlert({ handleDelete, isDeleting, startup, name }) {
+  const itemName = name || startup?.name || "this item";
+
   return (
     <AlertDialog>
        <Button
@@ -20,11 +22,11 @@ export function DeleteAlert({handleDelete,isDeleting,startup}) {
             <AlertDialog.CloseTrigger />
             <AlertDialog.Header>
               <AlertDialog.Icon status="danger" />
-              <AlertDialog.Heading>Delete {startup.name} permanently?</AlertDialog.Heading>
+              <AlertDialog.Heading>Delete {itemName} permanently?</AlertDialog.Heading>
             </AlertDialog.Header>
             <AlertDialog.Body>
               <p>
-                This will permanently delete <strong>{startup.name}</strong> and all of its
+                This will permanently delete <strong>{itemName}</strong> and all of its
                 data. This action cannot be undone.
               </p>
             </AlertDialog.Body>

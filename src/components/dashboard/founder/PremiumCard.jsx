@@ -13,6 +13,7 @@ import {
 import { Star, Check, ShieldCheck, Gear } from "@gravity-ui/icons";
 
 export default function PremiumCard({ isPremium }) {
+  
   const updateToPremium = async () => {
     const res = await fetch("/api/checkout_sessions", {
       method: "POST",
@@ -39,10 +40,10 @@ export default function PremiumCard({ isPremium }) {
           {/* --- State 1: Premium Member --- */}
 
           <div className="px-4 py-2">
-            <CardTitle>
-              <h3 className="text-xl font-bold tracking-tight text-[#131B3A]">
+            <CardTitle className="text-xl font-bold tracking-tight text-[#131B3A]">
+              
                 You&apos;re on Premium
-              </h3>
+              
 
               <p className="mt-2 text-sm leading-6 text-slate-500">
                 You have full access to all advanced tools, unlimited exports,

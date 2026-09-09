@@ -1,4 +1,7 @@
 import { getAdminTransactions } from "@/lib/api/admin";
+import { getAuthToken } from "@/lib/session";
+
+export const dynamic = "force-dynamic";
 
 const formatAmount = (amount, currency) =>
     new Intl.NumberFormat("en-US", {
@@ -20,7 +23,7 @@ const AdminTransactionsPage = async () => {
     let error = "";
 
     try {
-        transactions = await getAdminTransactions();
+        transactions = await getAdminTransactions(await getAuthToken());
     } catch (loadError) {
         console.error("Failed to load admin transactions:", loadError);
         error = "Transactions are temporarily unavailable.";
@@ -52,31 +55,31 @@ const AdminTransactionsPage = async () => {
                         <div className="space-y-3 sm:hidden">
                             {transactions.map((transaction) => (
                                 <article
-                                    key={transaction.id}
+                                    key={transaction.id || transaction._id}
                                     className="rounded-xl border border-gray-100 bg-[#FAFAFA] p-4"
                                 >
                                     <div className="flex items-start justify-between gap-3">
                                         <div className="min-w-0">
                                             <p className="truncate text-sm font-semibold text-[#131B3A]">
-                                                {transaction.email}
+                                                {transaction.email || transaction.user_email}
                                             </p>
                                             <p className="mt-1 text-xs text-gray-500">
-                                                {formatDate(transaction.createdAt)}
+                                                {formatDate(transaction.createdAt || transaction.paid_at)}
                                             </p>
                                         </div>
-                                        <span className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold capitalize ${transaction.status === "paid" ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"}`}>
-                                            {transaction.status}
+                                        <span className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold capitalize ${(transaction.status || transaction.payment_status) === "paid" ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"}`}>
+                                            {transaction.status || transaction.payment_status}
                                         </span>
                                     </div>
                                     <div className="mt-4 flex items-end justify-between gap-3">
                                         <div>
                                             <p className="text-xs uppercase tracking-wide text-gray-400">Amount</p>
                                             <p className="mt-1 text-lg font-semibold text-[#131B3A]">
-                                                {formatAmount(transaction.amount, transaction.currency)}
+                                                {formatAmount(transaction.amount, transaction.currency || "usd")}
                                             </p>
                                         </div>
                                         <p className="max-w-[55%] break-all text-right text-[11px] leading-4 text-gray-400">
-                                            {transaction.id}
+                                            {transaction.id || transaction.transaction_id || transaction._id}
                                         </p>
                                     </div>
                                 </article>
@@ -96,23 +99,23 @@ const AdminTransactionsPage = async () => {
                             </thead>
                             <tbody className="divide-y divide-gray-100">
                                 {transactions.map((transaction) => (
-                                    <tr key={transaction.id} className="hover:bg-[#FAFAFA]">
+                                    <tr key={transaction.id || transaction._id} className="hover:bg-[#FAFAFA]">
                                         <td className="px-4 py-4 text-sm font-medium text-[#131B3A]">
-                                            {transaction.email}
+                                            {transaction.email || transaction.user_email}
                                         </td>
                                         <td className="px-4 py-4 text-sm font-semibold text-[#131B3A]">
-                                            {formatAmount(transaction.amount, transaction.currency)}
+                                            {formatAmount(transaction.amount, transaction.currency || "usd")}
                                         </td>
                                         <td className="px-4 py-4">
-                                            <span className={`rounded-full px-3 py-1 text-xs font-semibold capitalize ${transaction.status === "paid" ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"}`}>
-                                                {transaction.status}
+                                            <span className={`rounded-full px-3 py-1 text-xs font-semibold capitalize ${(transaction.status || transaction.payment_status) === "paid" ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"}`}>
+                                                {transaction.status || transaction.payment_status}
                                             </span>
                                         </td>
                                         <td className="px-4 py-4 text-sm text-gray-500">
-                                            {formatDate(transaction.createdAt)}
+                                            {formatDate(transaction.createdAt || transaction.paid_at)}
                                         </td>
                                         <td className="max-w-52 truncate px-4 py-4 text-xs text-gray-400">
-                                            {transaction.id}
+                                            {transaction.id || transaction.transaction_id || transaction._id}
                                         </td>
                                     </tr>
                                 ))}

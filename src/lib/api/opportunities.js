@@ -5,6 +5,7 @@ const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
 
 export const getAuthHeaders = async () => {
   const { data } = await authClient.token();
+  console.log(data)
   return {
     "Content-Type": "application/json",
     Authorization: `Bearer ${data?.token}`,
@@ -13,6 +14,7 @@ export const getAuthHeaders = async () => {
 
 export const getFounderOpportunities = async(email)=>{
   const headers = await getAuthHeaders();
+  
     const res = await fetch(`${baseUrl}/api/opportunities/${email}`,{headers});
     return res.json();
 }

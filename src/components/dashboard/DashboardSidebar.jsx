@@ -39,14 +39,14 @@ export function DashboardSidebar() {
       label: "Applications",
     },
     {
+      icon: Gear,
+      href: "/dashboard/founder/transactions",
+      label: "Transactions",
+    },
+    {
       icon: Person,
       href: "/dashboard/founder/profile",
       label: "Profile",
-    },
-    {
-      icon: Gear,
-      href: "/dashboard/founder/premium-success?session_id=cs_test_a10rB14LRzrqsFWSznkXeMZcQiT9dwMWvVNcWCHzqwFcF3JsDmreXs3jMp",
-      label: "Premium Success",
     },
   ];
 

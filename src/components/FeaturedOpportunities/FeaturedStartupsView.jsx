@@ -122,7 +122,7 @@ export default function FeaturedStartupsView({ startups, opportunities }) {
                       </div>
                     </div>
                     <Link
-                      href="/browse-startups"
+                      href={`/browse-startups/${startup._id}`}
                       className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#131B3A] px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#202b55]"
                     >
                       View Startup

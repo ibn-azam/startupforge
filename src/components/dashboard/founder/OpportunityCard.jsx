@@ -347,7 +347,7 @@ const OpportunityCard = ({ opportunity, onUpdate, onDelete }) => {
               <DeleteAlert
                 isDeleting={isDeleting}
                 handleDelete={handleDelete}
-                startup={{ name: roleTitle }}
+                name={roleTitle || "this opportunity"}
               />
             </>
           )}

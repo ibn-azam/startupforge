@@ -1,25 +1,24 @@
-
 import DashboardStats from "@/components/dashboard/founder/DashboardStats";
-import {  FounderStatistics } from "@/components/dashboard/founder/FounderStatistics";
+import { FounderStatistics } from "@/components/dashboard/founder/FounderStatistics";
 import PremiumCard from "@/components/dashboard/founder/PremiumCard";
 import { getUserSession } from "@/lib/session";
 import { getFounderOpportunities } from "@/lib/api/opportunities";
 import { getFounderApplications } from "@/lib/actions/application";
 
-const toList = (data, key) => {
-  if (Array.isArray(data)) return data;
-  if (!data || typeof data !== "object") return [];
-
-  if (Array.isArray(data[key])) return data[key];
-  if (Array.isArray(data.data)) return data.data;
-  if (Array.isArray(data.data?.[key])) return data.data[key];
-  if (Array.isArray(data.result?.[key])) return data.result[key];
-
-  return [];
-};
+const toList = (data, key) =>
+  Array.isArray(data)
+    ? data
+    : Array.isArray(data?.[key])
+      ? data[key]
+      : Array.isArray(data?.data)
+        ? data.data
+        : [];
 
 const FounderDashboardPage = async () => {
   const user = await getUserSession();
+
+  console.log("user:", user);
+
   const isPremium = user?.isPremium;
 
   let opportunities = [];
@@ -31,13 +30,22 @@ const FounderDashboardPage = async () => {
       getFounderApplications(user.email),
     ]);
 
+    console.log("opportunitiesResult:", opportunitiesResult);
+    console.log("applicationsResult:", applicationsResult);
+
     if (opportunitiesResult.status === "fulfilled") {
       opportunities = toList(opportunitiesResult.value, "opportunities");
+    } else {
+      console.error("opportunities fetch failed:", opportunitiesResult.reason);
     }
 
     if (applicationsResult.status === "fulfilled") {
       applications = toList(applicationsResult.value, "applications");
+    } else {
+      console.error("applications fetch failed:", applicationsResult.reason);
     }
+  } else {
+    console.warn("No user.email found — skipping data fetch entirely.");
   }
 
   const founderStats = [
@@ -57,8 +65,8 @@ const FounderDashboardPage = async () => {
       <h2 className="text-2xl font-bold text-[#131B3A]">Founder Dashboard</h2>
       <div className="space-y-8">
         <PremiumCard isPremium={isPremium} />
-      <DashboardStats stats={founderStats}/>
-      <FounderStatistics stats={founderStats} />
+        <DashboardStats stats={founderStats} />
+        <FounderStatistics stats={founderStats} />
       </div>
     </div>
   );

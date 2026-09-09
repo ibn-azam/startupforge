@@ -26,6 +26,7 @@ import { getFounderStartups } from "@/lib/api/startups";
 import StartupCard from "@/components/dashboard/founder/StartupCard";
 
 import { toast } from "react-toastify";
+import Image from "next/image";
 
 const INDUSTRIES = [
   "Fintech",
@@ -82,13 +83,11 @@ export default function StartupsPage() {
   const [error, setError] = useState("");
 
   // =========================
-  // SET FOUNDER EMAIL
+  // SYNC FOUNDER EMAIL FROM SESSION
   // =========================
   useEffect(() => {
-    const email = session?.user?.email;
-
-    if (email) {
-      setFounderEmail(email);
+    if (session?.user?.email) {
+      setFounderEmail(session.user.email);
     }
   }, [session?.user?.email]);
 
@@ -296,14 +295,13 @@ export default function StartupsPage() {
         industry: String(industry),
         description: description.trim(),
         fundingStage: String(fundingStage),
-        founderEmail: email,
+        founderEmail: session?.user?.email || email,
       };
 
       console.log("Creating startup:", payload);
 
       const data = await createStartup(payload);
 
-      console.log("createStartup response:", data);
 
       // =========================
       // CHECK API RESPONSE
@@ -449,7 +447,9 @@ export default function StartupsPage() {
               <div className="flex flex-col items-center gap-3">
                 <div className="relative flex h-24 w-24 items-center justify-center overflow-hidden rounded-full border-2 border-[#6B7280]/30 bg-[#FAFAFA]">
                   {logoPreview ? (
-                    <img
+                    <Image
+                    width={100}
+                    height={100}
                       src={logoPreview}
                       alt="Startup logo preview"
                       className="h-full w-full object-cover"

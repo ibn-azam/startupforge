@@ -103,6 +103,12 @@ const SignUpPage = () => {
   return (
     <div className="min-h-screen w-full flex items-start sm:items-center justify-center bg-[#FAFAFA] px-4 py-8 sm:py-12">
       <Card className="w-full max-w-md sm:max-w-lg md:max-w-xl p-5 sm:p-8 shadow-sm rounded-2xl">
+        <Link href="/">
+                 <h2 className="text-xl font-bold sm:text-2xl text-center">
+                    <span className="text-[#131B3A]">Startup</span>
+                    <span className="text-[#FF6B35]">Forge</span>
+                 </h2>
+                </Link>
         <h1 className="text-xl sm:text-2xl font-bold text-[#131B3A] mb-6">
           Create your account
         </h1>

@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, Calendar } from "@gravity-ui/icons";
 import { Spinner } from "@heroui/react";
 import { getStartupById } from "@/lib/api/startups";
+import { getOpportunities } from "@/lib/api/opportunities";
 
 function formatDate(value) {
     if (!value) return "Not available";
@@ -23,6 +24,7 @@ const StartupDetailsPage = () => {
     const { id } = useParams();
     const router = useRouter();
     const [startup, setStartup] = useState(null);
+    const [opportunities, setOpportunities] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -30,10 +32,25 @@ const StartupDetailsPage = () => {
 
         const fetchData = async () => {
             try {
-                const data = await getStartupById(id);
+                const [data, opportunitiesData] = await Promise.all([
+                    getStartupById(id),
+                    getOpportunities(),
+                ]);
                 const result = data?.startup || data?.data || data;
+                const allOpportunities = Array.isArray(opportunitiesData)
+                    ? opportunitiesData
+                    : opportunitiesData?.data || opportunitiesData?.opportunities || [];
 
-                if (!cancelled) setStartup(result);
+                if (!cancelled) {
+                    setStartup(result);
+                    setOpportunities(
+                        allOpportunities.filter(
+                            (opportunity) =>
+                                String(opportunity.startupId) === String(result?._id ?? id) &&
+                                opportunity.status !== "closed",
+                        ),
+                    );
+                }
             } catch (error) {
                 if (!cancelled) setStartup(null);
             } finally {
@@ -155,6 +172,28 @@ const StartupDetailsPage = () => {
                                 </div>
                             )}
                         </div>
+                    </div>
+
+                    <div className="mt-8 border-t border-gray-100 pt-6">
+                        <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
+                            Active opportunities
+                        </p>
+                        {opportunities.length === 0 ? (
+                            <p className="mt-2 text-sm text-gray-500">No active opportunities listed.</p>
+                        ) : (
+                            <div className="mt-3 space-y-3">
+                                {opportunities.map((opportunity) => (
+                                    <div key={opportunity._id} className="rounded-xl border border-gray-100 bg-gray-50 p-4">
+                                        <p className="font-semibold text-[#131B3A]">
+                                            {opportunity.roleTitle || opportunity.title || "Open opportunity"}
+                                        </p>
+                                        {opportunity.description && (
+                                            <p className="mt-1 text-sm leading-6 text-gray-600">{opportunity.description}</p>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

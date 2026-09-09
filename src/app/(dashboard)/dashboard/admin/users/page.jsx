@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Button, Input, Spinner } from "@heroui/react";
 import { Magnifier, ShieldCheck, ShieldExclamation } from "@gravity-ui/icons";
 import { useSession } from "@/lib/auth-client";
+import { getAdminUsers, setAdminUserBlocked } from "@/lib/api/admin";
 
 const formatDate = (value) => {
     if (!value) return "-";
@@ -35,14 +36,8 @@ const AdminUsersPage = () => {
     useEffect(() => {
         const loadUsers = async () => {
             try {
-                const response = await fetch("/api/admin/users");
-                const data = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(data.message || "Failed to load users.");
-                }
-
-                setUsers(data.users || []);
+                const data = await getAdminUsers();
+                setUsers(data.users || data || []);
             } catch (loadError) {
                 setError(loadError.message || "Failed to load users.");
             } finally {
@@ -70,19 +65,7 @@ const AdminUsersPage = () => {
         setError("");
 
         try {
-            const response = await fetch("/api/admin/users", {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    userId: user._id,
-                    isBlocked: !user.isBlocked,
-                }),
-            });
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.message || "Failed to update user.");
-            }
+            const data = await setAdminUserBlocked(user._id, !user.isBlocked);
 
             setUsers((currentUsers) =>
                 currentUsers.map((currentUser) =>

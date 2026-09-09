@@ -1,54 +1,53 @@
 
-const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
+import { getAuthHeaders } from "./opportunities";
 
-export async function getAdminUserStats() {
-  const res = await fetch(`${baseUrl}/api/admin/users/stats`);
-  if (!res.ok) throw new Error("Failed to fetch user stats");
-  return res.json();
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "";
+
+async function request(path, options = {}, token) {
+  const headers = token
+    ? { "Content-Type": "application/json", Authorization: `Bearer ${token}` }
+    : await getAuthHeaders();
+  const res = await fetch(`${baseUrl}${path}`, {
+    ...options,
+    headers: { ...headers, ...options.headers },
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data?.message || "Admin request failed");
+  return data;
 }
 
-export async function getAdminUsers() {
-  const res = await fetch(`${baseUrl}/api/admin/users`);
-  if (!res.ok) throw new Error("Failed to fetch users");
-  return res.json();
+export async function getAdminUserStats(token) {
+  return request("/api/admin/stats", {}, token);
 }
 
-export async function setAdminUserBlocked(userId, isBlocked) {
-  const res = await fetch(`${baseUrl}/api/admin/users/block`, {
+export async function getAdminUsers(token) {
+  return request("/api/admin/users", {}, token);
+}
+
+export async function setAdminUserBlocked(userId, isBlocked, token) {
+  return request(`/api/admin/users/${userId}/block`, {
     method: "PATCH",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ userId, isBlocked }),
-  });
-  if (!res.ok) throw new Error("Failed to update user block status");
-  return res.json();
+  }, token);
 }
 
-export async function getAdminStartups() {
-  const res = await fetch(`${baseUrl}/api/admin/startups`);
-  if (!res.ok) throw new Error("Failed to fetch startups");
-  return res.json();
+export async function getAdminStartups(token) {
+  return request("/api/admin/startups", {}, token);
 }
 
-export async function approveAdminStartup(startupId) {
-  const res = await fetch(`${baseUrl}/api/admin/startups/approve`, {
+export async function approveAdminStartup(startupId, token) {
+  return request(`/api/admin/startups/${startupId}/approve`, {
     method: "PATCH",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ startupId }),
-  });
-  if (!res.ok) throw new Error("Failed to approve startup");
-  return res.json();
+  }, token);
 }
 
-export async function removeAdminStartup(startupId) {
-  const res = await fetch(`${baseUrl}/api/admin/startups?id=${startupId}`, {
+export async function removeAdminStartup(startupId, token) {
+  return request(`/api/admin/startups/${startupId}`, {
     method: "DELETE",
-  });
-  if (!res.ok) throw new Error("Failed to remove startup");
-  return res.json();
+  }, token);
 }
 
-export async function getAdminTransactions() {
-  const res = await fetch(`${baseUrl}/api/admin/transactions`);
-  if (!res.ok) throw new Error("Failed to fetch transactions");
-  return res.json();
+export async function getAdminTransactions(token) {
+  return request("/api/admin/transactions", {}, token);
 }

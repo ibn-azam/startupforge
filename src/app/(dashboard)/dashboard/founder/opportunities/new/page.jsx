@@ -91,6 +91,17 @@ export default function AddOpportunityPage() {
 
     setError("");
 
+    if(!startup?._id){
+       setError("Please Create Startup First");
+      toast.error("Please Create Startup First");
+      return;
+    }
+    if(startup?.status === "pending"){
+       setError("Your starup has not activated yet");
+      toast.error("Your starup has not activated yet");
+      return;
+    }
+
     if (
       !roleTitle.trim() ||
       !requiredSkills.trim() ||

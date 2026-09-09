@@ -1,36 +1,54 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# StartupForge client
 
-## Getting Started
+StartupForge is a Next.js application that connects startup founders with collaborators and startup opportunities.
 
-First, run the development server:
+## Stack
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Next.js 16, React 19, Tailwind CSS
+- Better Auth with Google OAuth and MongoDB
+- Stripe Checkout
+- HeroUI, Framer Motion, Recharts
+- ImgBB for profile and startup images
+
+## Local setup
+
+1. Install Node.js 20 or newer.
+2. Install dependencies: `npm install`
+3. Create `.env.local` with the required values:
+
+```env
+BETTER_AUTH_SECRET=
+BETTER_AUTH_URL=http://localhost:3000
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+MONGODB_URI=
+MONGO_DB_COLLECTION=startupforge
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+NEXT_PUBLIC_BASE_URL=http://localhost:5000
+NEXT_PUBLIC_IMAGE_UPLOAD_API=
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=
+STRIPE_SECRET_KEY=
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+4. Start the client: `npm run dev`
+5. Open `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+The API server must be running at `NEXT_PUBLIC_BASE_URL`. Never commit `.env` or `.env.local`.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Features
 
-## Learn More
+- Founder, collaborator, and admin dashboards
+- Startup and opportunity browsing
+- Applications and founder decisions
+- Profile editing with image uploads
+- Stripe premium subscriptions and transaction history
+- Admin moderation and platform statistics
 
-To learn more about Next.js, take a look at the following resources:
+## Validation
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm run lint
+npm run build
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Use non-production test accounts and Stripe test-mode credentials during development. Production credentials and test credentials should be managed in the deployment provider rather than committed to documentation.
