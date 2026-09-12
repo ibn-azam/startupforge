@@ -28,11 +28,15 @@ const FounderTransactionsPage = () => {
 
         setLoading(true);
         setError(null);
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/payments/me`, {
-          headers: await getAuthHeaders(),
-        });
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/payments/me`,
+          {
+            headers: await getAuthHeaders(),
+          },
+        );
 
-        if (!res.ok) throw new Error(`Failed to fetch payments (${res.status})`);
+        if (!res.ok)
+          throw new Error(`Failed to fetch payments (${res.status})`);
         const data = await res.json();
         setTransactions(Array.isArray(data) ? data : []);
       } catch (err) {

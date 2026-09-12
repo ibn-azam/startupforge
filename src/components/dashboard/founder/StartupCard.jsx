@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "@heroui/react";
 import {
   Envelope,
@@ -29,9 +28,7 @@ const emptyForm = (startup) => ({
 const fieldClass =
   "mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:border-[#FF6B35] focus:outline-none";
 
-const StartupCard = ({ startup }) => {
-  const router = useRouter();
-
+const StartupCard = ({ startup, onUpdate, onDelete }) => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -47,7 +44,6 @@ const StartupCard = ({ startup }) => {
 
   // Handle Dynamic Delete Call
   const handleDelete = async () => {
-
     try {
       setIsDeleting(true);
 
@@ -63,8 +59,12 @@ const StartupCard = ({ startup }) => {
       if (!response.ok) {
         throw new Error(data?.message || `Request failed with status ${response.status}`);
       }
+
       toast.success('Startup Deleted Successfully')
-      router.refresh();
+
+      // Update parent state directly instead of router.refresh(),
+      // which is a no-op against useState/useEffect-loaded data.
+      onDelete?.(_id);
     } catch (error) {
       toast.error(error.message || "Something went wrong while deleting the startup.");
     } finally {
@@ -92,12 +92,16 @@ const StartupCard = ({ startup }) => {
       const formData = new FormData();
       formData.append("image", file);
 
-      const uploadedUrl = await uploadImageToImgbb(formData);
+      const result = await uploadImageToImgbb(formData);
 
-      setForm((prev) => ({ ...prev, logoUrl: uploadedUrl }));
+      if (result?.success && result?.url) {
+        setForm((prev) => ({ ...prev, logoUrl: result.url }));
+      } else {
+        toast.error(result?.error || "Failed to upload logo. Please try again.");
+      }
     } catch (error) {
       console.error("Logo upload error:", error);
-      alert("Failed to upload logo. Please try again.");
+      toast.error("Failed to upload logo. Please try again.");
     } finally {
       setIsUploadingLogo(false);
       e.target.value = "";
@@ -156,7 +160,11 @@ const StartupCard = ({ startup }) => {
 
       setIsEditing(false);
       toast.success('Startup Updated Successfully')
-      router.refresh();
+
+      // Prefer the server's returned document if the API sends one back;
+      // otherwise fall back to merging the payload into the original startup.
+      const updatedStartup = data?.startup || data?.data || { ...startup, ...payload };
+      onUpdate?.(updatedStartup);
     } catch (error) {
       console.error("Edit error:", error);
       alert(error.message || "Something went wrong while updating the startup.");

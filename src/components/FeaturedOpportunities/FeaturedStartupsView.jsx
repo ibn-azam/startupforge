@@ -51,7 +51,8 @@ export default function FeaturedStartupsView({ startups, opportunities }) {
             </span>
           </h2>
           <p className="mx-auto max-w-2xl text-lg leading-relaxed text-[#6B7280]">
-            Discover the newest companies building ambitious ideas and assembling their next great teams.
+            Discover the newest companies building ambitious ideas and
+            assembling their next great teams.
           </p>
         </motion.div>
 
@@ -59,7 +60,8 @@ export default function FeaturedStartupsView({ startups, opportunities }) {
           <div className="mb-14 grid grid-cols-1 gap-6 md:grid-cols-3">
             {startups.map((startup) => {
               const startupOpportunities = opportunities.filter(
-                (opportunity) => String(opportunity.startupId) === String(startup._id),
+                (opportunity) =>
+                  String(opportunity.startupId) === String(startup._id),
               );
               const teamSize = startup.teamSizeNeeded || startup.teamSize;
               const teamLabel = teamSize
@@ -106,9 +108,13 @@ export default function FeaturedStartupsView({ startups, opportunities }) {
                     </div>
                     <div className="mt-5 space-y-4 border-t border-gray-100 pt-5">
                       <div>
-                        <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">Founder</p>
+                        <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
+                          Founder
+                        </p>
                         <p className="mt-1 truncate text-sm font-semibold text-[#131B3A]">
-                          {startup.founderName || startup.founderEmail || "Founder not specified"}
+                          {startup.founderName ||
+                            startup.founderEmail ||
+                            "Founder not specified"}
                         </p>
                       </div>
                       <div className="flex items-center gap-3">
@@ -116,8 +122,12 @@ export default function FeaturedStartupsView({ startups, opportunities }) {
                           <Persons size={16} />
                         </div>
                         <div>
-                          <p className="text-xs text-gray-400">Team Size Needed</p>
-                          <p className="text-sm font-semibold text-gray-700">{teamLabel}</p>
+                          <p className="text-xs text-gray-400">
+                            Team Size Needed
+                          </p>
+                          <p className="text-sm font-semibold text-gray-700">
+                            {teamLabel}
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -134,7 +144,10 @@ export default function FeaturedStartupsView({ startups, opportunities }) {
             })}
           </div>
         ) : (
-          <motion.div variants={itemVariants} className="rounded-2xl border border-dashed border-gray-300 bg-white px-6 py-12 text-center text-sm text-gray-500">
+          <motion.div
+            variants={itemVariants}
+            className="rounded-2xl border border-dashed border-gray-300 bg-white px-6 py-12 text-center text-sm text-gray-500"
+          >
             No startups are available yet.
           </motion.div>
         )}

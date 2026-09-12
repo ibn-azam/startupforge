@@ -19,6 +19,7 @@ import { uploadImageToImgbb } from "@/lib/actions/actions";
 import Image from "next/image";
 import Link from "next/link";
 
+
 const SignUpPage = () => {
   const router = useRouter();
   const [isUploading, setIsUploading] = useState(false);
@@ -94,7 +95,7 @@ const SignUpPage = () => {
 
     if (data) {
       toast.success("Account created! Please log in.");
-        router.push("/login");
+      router.push("/login");
     }
     if (error) {
       toast.error("signup failed");
@@ -104,11 +105,11 @@ const SignUpPage = () => {
     <div className="min-h-screen w-full flex items-start sm:items-center justify-center bg-[#FAFAFA] px-4 py-8 sm:py-12">
       <Card className="w-full max-w-md sm:max-w-lg md:max-w-xl p-5 sm:p-8 shadow-sm rounded-2xl">
         <Link href="/">
-                 <h2 className="text-xl font-bold sm:text-2xl text-center">
-                    <span className="text-[#131B3A]">Startup</span>
-                    <span className="text-[#FF6B35]">Forge</span>
-                 </h2>
-                </Link>
+          <h2 className="text-xl font-bold sm:text-2xl text-center">
+            <span className="text-[#131B3A]">Startup</span>
+            <span className="text-[#FF6B35]">Forge</span>
+          </h2>
+        </Link>
         <h1 className="text-xl sm:text-2xl font-bold text-[#131B3A] mb-6">
           Create your account
         </h1>
@@ -144,7 +145,7 @@ const SignUpPage = () => {
               {uploadedImageUrl ? (
                 <>
                   <Image
-                  width={80}
+                    width={80}
                     height={80}
                     src={uploadedImageUrl}
                     alt="Uploaded profile"
@@ -257,11 +258,14 @@ const SignUpPage = () => {
               {isUploading ? "Uploading..." : "Create"}
             </Button>
             <div className="text-center text-sm text-gray-500">
-                               <span>Already have an account?</span>{" "}
-                               <Link href="/login" className="font-semibold text-[#FF6B35] hover:underline">
-                                   Login
-                               </Link>
-                              </div>
+              <span>Already have an account?</span>{" "}
+              <Link
+                href="/login"
+                className="font-semibold text-[#FF6B35] hover:underline"
+              >
+                Login
+              </Link>
+            </div>
           </div>
         </Form>
       </Card>

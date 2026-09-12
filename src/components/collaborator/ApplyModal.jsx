@@ -1,8 +1,8 @@
 "use client";
 
-import {useState, useEffect} from "react";
-import {useRouter} from "next/navigation";
-import {Envelope} from "@gravity-ui/icons";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { Envelope } from "@gravity-ui/icons";
 import {
   Button,
   Input,
@@ -12,10 +12,13 @@ import {
   TextArea,
   TextField,
 } from "@heroui/react";
-import {toast} from "react-toastify";
-import {applyToOpportunity, checkApplicationStatus} from "@/lib/actions/application";
+import { toast } from "react-toastify";
+import {
+  applyToOpportunity,
+  checkApplicationStatus,
+} from "@/lib/actions/application";
 
-export function ApplyModal({opportunityId, applicantEmail}) {
+export function ApplyModal({ opportunityId, applicantEmail }) {
   const [isOpen, setIsOpen] = useState(false);
   const [portfolioLink, setPortfolioLink] = useState("");
   const [motivationMessage, setMotivationMessage] = useState("");
@@ -28,10 +31,13 @@ export function ApplyModal({opportunityId, applicantEmail}) {
     if (!opportunityId || !applicantEmail) {
       Promise.resolve().then(() => setChecking(false));
       return;
-    }       
+    }
 
     const checkStatus = async () => {
-      const result = await checkApplicationStatus(opportunityId, applicantEmail);
+      const result = await checkApplicationStatus(
+        opportunityId,
+        applicantEmail,
+      );
       setHasApplied(!!result?.hasApplied);
       setChecking(false);
     };
@@ -85,10 +91,10 @@ export function ApplyModal({opportunityId, applicantEmail}) {
 
       <Modal.Backdrop className="bg-[#131B3A]/40 p-4 backdrop-blur-sm">
         <Modal.Container placement="center">
-          <Modal.Dialog className="w-full max-w-lg overflow-hidden rounded-2xl border border-[#6B7280]/10 bg-white shadow-xl">
+          <Modal.Dialog className="flex max-h-[85vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl border border-[#6B7280]/10 bg-white shadow-xl">
             <Modal.CloseTrigger className="text-[#6B7280] hover:text-[#131B3A]" />
 
-            <Modal.Header className="border-b border-[#6B7280]/10 bg-[#FAFAFA] px-6 py-5">
+            <Modal.Header className="shrink-0 border-b border-[#6B7280]/10 bg-[#FAFAFA] px-6 py-5">
               <Modal.Heading className="font-space-grotesk text-xl font-bold text-[#131B3A]">
                 Apply to Opportunity
               </Modal.Heading>
@@ -98,8 +104,11 @@ export function ApplyModal({opportunityId, applicantEmail}) {
               </p>
             </Modal.Header>
 
-            <form onSubmit={handleSubmit}>
-              <Modal.Body className="max-h-[70vh] overflow-y-auto px-6 py-5">
+            <form
+              onSubmit={handleSubmit}
+              className="flex min-h-0 flex-1 flex-col"
+            >
+              <Modal.Body className="flex-1 overflow-y-auto px-6 py-5">
                 {/* Applying-as summary, replaces editable-looking read-only fields */}
                 <div className="mb-5 flex items-center gap-3 rounded-xl border border-[#6B7280]/10 bg-[#FAFAFA] px-4 py-3">
                   <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#131B3A]/5">
@@ -147,7 +156,7 @@ export function ApplyModal({opportunityId, applicantEmail}) {
                         Motivation Message
                       </Label>
                       <TextArea
-                        className="min-h-20 resize-none focus:border-[#FF6B35] focus:ring-[#FF6B35]/20"
+                        className="min-h-32 resize-none focus:border-[#FF6B35] focus:ring-[#FF6B35]/20"
                         placeholder="Why are you a good fit for this role?"
                       />
                     </TextField>
@@ -155,7 +164,7 @@ export function ApplyModal({opportunityId, applicantEmail}) {
                 </Surface>
               </Modal.Body>
 
-              <Modal.Footer className="flex gap-3 border-t border-[#6B7280]/10 bg-[#FAFAFA] px-6 py-4">
+              <Modal.Footer className="flex shrink-0 gap-3 border-t border-[#6B7280]/10 bg-[#FAFAFA] px-6 py-4">
                 <Button
                   type="button"
                   onPress={() => setIsOpen(false)}

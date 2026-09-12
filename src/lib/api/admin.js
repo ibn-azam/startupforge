@@ -1,4 +1,3 @@
-
 import { getAuthHeaders } from "./opportunities";
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "";
@@ -25,10 +24,14 @@ export async function getAdminUsers(token) {
 }
 
 export async function setAdminUserBlocked(userId, isBlocked, token) {
-  return request(`/api/admin/users/${userId}/block`, {
-    method: "PATCH",
-    body: JSON.stringify({ userId, isBlocked }),
-  }, token);
+  return request(
+    `/api/admin/users/${userId}/block`,
+    {
+      method: "PATCH",
+      body: JSON.stringify({ userId, isBlocked }),
+    },
+    token,
+  );
 }
 
 export async function getAdminStartups(token) {
@@ -36,16 +39,24 @@ export async function getAdminStartups(token) {
 }
 
 export async function approveAdminStartup(startupId, token) {
-  return request(`/api/admin/startups/${startupId}/approve`, {
-    method: "PATCH",
-    body: JSON.stringify({ startupId }),
-  }, token);
+  return request(
+    `/api/admin/startups/${startupId}/approve`,
+    {
+      method: "PATCH",
+      body: JSON.stringify({ startupId }),
+    },
+    token,
+  );
 }
 
 export async function removeAdminStartup(startupId, token) {
-  return request(`/api/admin/startups/${startupId}`, {
-    method: "DELETE",
-  }, token);
+  return request(
+    `/api/admin/startups/${startupId}`,
+    {
+      method: "DELETE",
+    },
+    token,
+  );
 }
 
 export async function getAdminTransactions(token) {

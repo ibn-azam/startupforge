@@ -16,11 +16,23 @@ function formatDate(date) {
   if (!date) return "—";
   const d = new Date(date);
   if (Number.isNaN(d.getTime())) return date;
-  return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  return d.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
 }
 
 const FounderApplicationCard = ({ application, onUpdate }) => {
-  const { _id, opportunity = {}, status, applicantEmail, portfolioLink, motivationMessage, appliedAt } = application;
+  const {
+    _id,
+    opportunity = {},
+    status,
+    applicantEmail,
+    portfolioLink,
+    motivationMessage,
+    appliedAt,
+  } = application;
   const { roleTitle } = opportunity;
   const [updating, setUpdating] = useState(false);
 
@@ -40,7 +52,9 @@ const FounderApplicationCard = ({ application, onUpdate }) => {
   return (
     <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition-all duration-300 hover:shadow-lg">
       <div className="relative flex items-center justify-between bg-linear-to-br from-[#131B3A] to-[#273766] px-6 py-4">
-        <span className="text-sm font-semibold text-white/80">{roleTitle || "Opportunity"}</span>
+        <span className="text-sm font-semibold text-white/80">
+          {roleTitle || "Opportunity"}
+        </span>
         <span
           className={`rounded-full px-3 py-1 text-xs font-semibold ${
             STATUS_STYLES[status] || "bg-gray-100 text-gray-700"
@@ -51,14 +65,17 @@ const FounderApplicationCard = ({ application, onUpdate }) => {
       </div>
 
       <div className="p-6">
-        <h3 className="line-clamp-1 text-lg font-bold text-[#131B3A]">{applicantEmail}</h3>
+        <h3 className="line-clamp-1 text-lg font-bold text-[#131B3A]">
+          {applicantEmail}
+        </h3>
 
         <div className="mt-4">
           <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
             Portfolio Link
           </p>
-          
-           <a href={portfolioLink}
+
+          <a
+            href={portfolioLink}
             target="_blank"
             rel="noopener noreferrer"
             className="mt-1 block truncate text-sm font-medium text-[#131B3A] underline"
@@ -80,7 +97,9 @@ const FounderApplicationCard = ({ application, onUpdate }) => {
           </div>
           <div>
             <p className="text-xs text-gray-400">Applied On</p>
-            <p className="text-sm font-semibold text-gray-700">{formatDate(appliedAt)}</p>
+            <p className="text-sm font-semibold text-gray-700">
+              {formatDate(appliedAt)}
+            </p>
           </div>
         </div>
 

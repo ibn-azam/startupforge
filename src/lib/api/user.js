@@ -1,8 +1,6 @@
 import { getAuthHeaders } from "./opportunities";
 
-const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
-
-
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
 export const getProfile = async () => {
   const headers = await getAuthHeaders();

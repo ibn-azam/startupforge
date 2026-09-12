@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+
 import { useRouter } from "next/navigation";
 
 import {
@@ -15,9 +16,11 @@ import {
 } from "@heroui/react";
 
 import { toast } from "react-toastify";
-import { createOpportunity } from "@/lib/actions/startups";
-import { useSession } from "@/lib/auth-client";
+
+import { authClient } from "@/lib/auth-client";
 import { getFounderStartups } from "@/lib/api/startups";
+
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
 const WORK_TYPES = ["Remote", "Onsite", "Hybrid"];
 
@@ -31,7 +34,9 @@ const COMMITMENT_LEVELS = [
 
 export default function AddOpportunityPage() {
   const router = useRouter();
-  const { data: session } = useSession();
+
+  const { data: session } = authClient.useSession();
+
   const user = session?.user;
 
   const [roleTitle, setRoleTitle] = useState("");
@@ -56,6 +61,7 @@ export default function AddOpportunityPage() {
 
       try {
         const data = await getFounderStartups(email);
+
         const startups = Array.isArray(data)
           ? data
           : Array.isArray(data?.startups)
@@ -64,9 +70,12 @@ export default function AddOpportunityPage() {
               ? data.data
               : [];
 
-        if (!cancelled) setStartup(startups[0] || null);
+        if (!cancelled) {
+          setStartup(startups[0] || null);
+        }
       } catch (loadError) {
         console.error("Failed to load startup:", loadError);
+
         if (!cancelled) {
           setStartup(null);
           toast.error("Failed to load startup.");
@@ -82,6 +91,44 @@ export default function AddOpportunityPage() {
   }, [user?.email]);
 
   // -----------------------------
+  // CREATE OPPORTUNITY WITH JWT
+  // -----------------------------
+  const createOpportunityDirectly = async (newOpportunityData) => {
+    const { data } = await authClient.token();
+
+    const token = data?.token;
+
+    if (!token) {
+      throw new Error("Authentication token not found.");
+    }
+
+    const res = await fetch(`${baseUrl}/api/opportunity`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(newOpportunityData),
+    });
+
+    let result = null;
+
+    try {
+      result = await res.json();
+    } catch {
+      result = null;
+    }
+
+    if (!res.ok) {
+      throw new Error(
+        result?.message || result?.error || "Failed to add opportunity.",
+      );
+    }
+
+    return result;
+  };
+
+  // -----------------------------
   // FORM SUBMIT
   // -----------------------------
   const handleSubmit = async (e) => {
@@ -91,14 +138,15 @@ export default function AddOpportunityPage() {
 
     setError("");
 
-    if(!startup?._id){
-       setError("Please Create Startup First");
+    if (!startup?._id) {
+      setError("Please Create Startup First");
       toast.error("Please Create Startup First");
       return;
     }
-    if(startup?.status === "pending"){
-       setError("Your starup has not activated yet");
-      toast.error("Your starup has not activated yet");
+
+    if (startup?.status === "pending") {
+      setError("Your startup has not activated yet");
+      toast.error("Your startup has not activated yet");
       return;
     }
 
@@ -107,7 +155,7 @@ export default function AddOpportunityPage() {
       !requiredSkills.trim() ||
       !workType ||
       !commitmentLevel ||
-      !startup?._id || 
+      !startup?._id ||
       !deadline
     ) {
       setError("Please fill in all required fields.");
@@ -126,19 +174,26 @@ export default function AddOpportunityPage() {
     try {
       const payload = {
         roleTitle: roleTitle.trim(),
+
         requiredSkills: requiredSkills
           .split(",")
           .map((skill) => skill.trim())
           .filter(Boolean),
+
         workType: String(workType),
+
         commitmentLevel: String(commitmentLevel),
+
         startupId: startup._id,
+
         industry: startup.industry,
+
         deadline,
+
         founderEmail: user.email,
       };
 
-      const data = await createOpportunity(payload);
+      const data = await createOpportunityDirectly(payload);
 
       if (data?.insertedId) {
         toast.success("Opportunity added successfully!");
@@ -152,15 +207,15 @@ export default function AddOpportunityPage() {
 
         router.push("/dashboard/founder/opportunities");
       } else {
-        const message =
-          data?.message || "Failed to add opportunity.";
+        const message = data?.message || "Failed to add opportunity.";
 
         setError(message);
         toast.error(message);
       }
     } catch (error) {
-      const message =
-        error?.message || "Opportunity creation failed";
+      console.error("Create opportunity error:", error);
+
+      const message = error?.message || "Opportunity creation failed";
 
       setError(message);
       toast.error(message);
@@ -170,11 +225,8 @@ export default function AddOpportunityPage() {
   };
 
   return (
-    <Card className="max-w-xl mx-auto my-8 bg-[#FAFAFA] shadow-md border border-[#6B7280]/10">
-      <form
-        onSubmit={handleSubmit}
-        className="mx-auto w-full space-y-6 p-6"
-      >
+    <Card className="mx-auto my-8 max-w-xl border border-[#6B7280]/10 bg-[#FAFAFA] shadow-md">
+      <form onSubmit={handleSubmit} className="mx-auto w-full space-y-6 p-6">
         <div>
           <h1 className="font-space-grotesk text-2xl font-bold text-[#131B3A]">
             Add Opportunity
@@ -231,12 +283,9 @@ export default function AddOpportunityPage() {
           <Select.Popover>
             <ListBox>
               {WORK_TYPES.map((item) => (
-                <ListBox.Item
-                  key={item}
-                  id={item}
-                  textValue={item}
-                >
+                <ListBox.Item key={item} id={item} textValue={item}>
                   {item}
+
                   <ListBox.ItemIndicator />
                 </ListBox.Item>
               ))}
@@ -260,12 +309,9 @@ export default function AddOpportunityPage() {
           <Select.Popover>
             <ListBox>
               {COMMITMENT_LEVELS.map((level) => (
-                <ListBox.Item
-                  key={level}
-                  id={level}
-                  textValue={level}
-                >
+                <ListBox.Item key={level} id={level} textValue={level}>
                   {level}
+
                   <ListBox.ItemIndicator />
                 </ListBox.Item>
               ))}
@@ -300,9 +346,7 @@ export default function AddOpportunityPage() {
           isLoading={submitting}
           className="w-full bg-[#FF6B35] font-medium text-white"
         >
-          {submitting
-            ? "Adding Opportunity..."
-            : "Add Opportunity"}
+          {submitting ? "Adding Opportunity..." : "Add Opportunity"}
         </Button>
       </form>
     </Card>

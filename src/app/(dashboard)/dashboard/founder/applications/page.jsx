@@ -9,6 +9,7 @@ import { Spinner } from "@heroui/react";
 const FounderApplicationsPage = () => {
   const { data: session } = useSession();
   const user = session?.user;
+
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -16,10 +17,22 @@ const FounderApplicationsPage = () => {
     if (!user?.email) return;
 
     const fetchData = async () => {
-      const data = await getFounderApplications(user.email);
-      setApplications(data);
-      setLoading(false);
+      try {
+        const data = await getFounderApplications(user.email);
+
+        const applicationList = Array.isArray(data)
+          ? data
+          : data?.applications || [];
+
+        setApplications(applicationList);
+      } catch (error) {
+        console.error("Failed to fetch applications:", error);
+        setApplications([]);
+      } finally {
+        setLoading(false);
+      }
     };
+
     fetchData();
   }, [user?.email]);
 
@@ -29,10 +42,21 @@ const FounderApplicationsPage = () => {
     );
   };
 
-  if (loading) return <div className="flex items-center justify-center min-h-screen"><Spinner className="text-[#FF6B35]" size="lg" /></div>;
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Spinner className="text-[#FF6B35]" size="lg" />
+      </div>
+    );
+  }
 
-  if (applications.length === 0)
-    return <div className="p-6 text-sm text-gray-500">No applications received yet.</div>;
+  if (applications.length === 0) {
+    return (
+      <div className="p-6 text-sm text-gray-500">
+        No applications received yet.
+      </div>
+    );
+  }
 
   return (
     <div className="p-6">
@@ -42,6 +66,7 @@ const FounderApplicationsPage = () => {
       >
         Applications Received
       </h2>
+
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         {applications.map((application) => (
           <FounderApplicationCard

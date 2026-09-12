@@ -1,23 +1,12 @@
 import DashboardStats from "@/components/dashboard/founder/DashboardStats";
 import { FounderStatistics } from "@/components/dashboard/founder/FounderStatistics";
 import PremiumCard from "@/components/dashboard/founder/PremiumCard";
-import { getUserSession } from "@/lib/session";
+import { getAuthToken, getUserSession } from "@/lib/session";
 import { getFounderOpportunities } from "@/lib/api/opportunities";
 import { getFounderApplications } from "@/lib/actions/application";
 
-const toList = (data, key) =>
-  Array.isArray(data)
-    ? data
-    : Array.isArray(data?.[key])
-      ? data[key]
-      : Array.isArray(data?.data)
-        ? data.data
-        : [];
-
 const FounderDashboardPage = async () => {
   const user = await getUserSession();
-
-  console.log("user:", user);
 
   const isPremium = user?.isPremium;
 
@@ -25,37 +14,76 @@ const FounderDashboardPage = async () => {
   let applications = [];
 
   if (user?.email) {
+    const token = await getAuthToken();
+    const requestHeaders = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    };
+
     const [opportunitiesResult, applicationsResult] = await Promise.allSettled([
-      getFounderOpportunities(user.email),
-      getFounderApplications(user.email),
+      getFounderOpportunities(user.email, requestHeaders),
+      getFounderApplications(user.email, requestHeaders),
     ]);
 
-    console.log("opportunitiesResult:", opportunitiesResult);
-    console.log("applicationsResult:", applicationsResult);
-
+    // Opportunities
     if (opportunitiesResult.status === "fulfilled") {
-      opportunities = toList(opportunitiesResult.value, "opportunities");
+      console.log("FOUNDER OPPORTUNITIES:", opportunitiesResult.value);
+
+      const oppData = opportunitiesResult.value;
+
+      if (Array.isArray(oppData)) {
+        opportunities = oppData;
+      } else if (Array.isArray(oppData?.opportunities)) {
+        opportunities = oppData.opportunities;
+      } else if (Array.isArray(oppData?.data)) {
+        opportunities = oppData.data;
+      } else {
+        opportunities = [];
+      }
     } else {
-      console.error("opportunities fetch failed:", opportunitiesResult.reason);
+      console.error("OPPORTUNITIES FETCH ERROR:", opportunitiesResult.reason);
     }
 
+    // Applications
     if (applicationsResult.status === "fulfilled") {
-      applications = toList(applicationsResult.value, "applications");
+      console.log("FOUNDER APPLICATIONS:", applicationsResult.value);
+
+      const applicationData = applicationsResult.value;
+
+      if (Array.isArray(applicationData)) {
+        applications = applicationData;
+      } else if (Array.isArray(applicationData?.applications)) {
+        applications = applicationData.applications;
+      } else if (Array.isArray(applicationData?.data)) {
+        applications = applicationData.data;
+      } else {
+        applications = [];
+      }
     } else {
-      console.error("applications fetch failed:", applicationsResult.reason);
+      console.error("APPLICATIONS FETCH ERROR:", applicationsResult.reason);
     }
   } else {
-    console.warn("No user.email found — skipping data fetch entirely.");
+    console.warn("No user email found.");
   }
 
+  const acceptedMembers = applications.filter(
+    (application) => application?.status?.toLowerCase() === "accepted",
+  ).length;
+
   const founderStats = [
-    { title: "Total Opportunities", value: opportunities.length, icon: "FileText" },
-    { title: "Total Applications", value: applications.length, icon: "Thunderbolt" },
+    {
+      title: "Total Opportunities",
+      value: opportunities.length,
+      icon: "FileText",
+    },
+    {
+      title: "Total Applications",
+      value: applications.length,
+      icon: "Thunderbolt",
+    },
     {
       title: "Accepted Members",
-      value: applications.filter(
-        (application) => application.status?.toLowerCase() === "accepted",
-      ).length,
+      value: acceptedMembers,
       icon: "Persons",
     },
   ];
@@ -63,9 +91,12 @@ const FounderDashboardPage = async () => {
   return (
     <div className="flex flex-col gap-6 p-6 lg:max-w-4xl">
       <h2 className="text-2xl font-bold text-[#131B3A]">Founder Dashboard</h2>
+
       <div className="space-y-8">
         <PremiumCard isPremium={isPremium} />
+
         <DashboardStats stats={founderStats} />
+
         <FounderStatistics stats={founderStats} />
       </div>
     </div>

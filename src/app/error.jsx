@@ -21,7 +21,14 @@ export default function Error({ error, reset }) {
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
           >
-            <ellipse cx="160" cy="230" rx="100" ry="12" fill="#131B3A" opacity="0.08" />
+            <ellipse
+              cx="160"
+              cy="230"
+              rx="100"
+              ry="12"
+              fill="#131B3A"
+              opacity="0.08"
+            />
 
             {/* left tong arm */}
             <path
@@ -48,7 +55,14 @@ export default function Error({ error, reset }) {
             <circle cx="160" cy="76" r="10" fill="#FF6B35" />
 
             {/* break glow at the snap point */}
-            <circle cx="197" cy="126" r="9" fill="#FF6B35" opacity="0.9" className="glow" />
+            <circle
+              cx="197"
+              cy="126"
+              r="9"
+              fill="#FF6B35"
+              opacity="0.9"
+              className="glow"
+            />
             <path
               d="M188 118l18 16M206 118l-18 16"
               stroke="#FF6B35"
@@ -91,7 +105,8 @@ export default function Error({ error, reset }) {
           animation: glow-pulse 1.4s ease-in-out infinite;
         }
         @keyframes glow-pulse {
-          0%, 100% {
+          0%,
+          100% {
             opacity: 0.5;
           }
           50% {

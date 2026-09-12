@@ -8,7 +8,6 @@ import { getOpportunityById } from "@/lib/api/opportunities";
 import { useSession } from "@/lib/auth-client";
 import { ApplyModal } from "@/components/collaborator/ApplyModal";
 
-
 const WORK_TYPE_STYLES = {
   Remote: "bg-emerald-50 text-emerald-700",
   Onsite: "bg-blue-50 text-blue-700",
@@ -30,7 +29,7 @@ function formatDeadline(deadline) {
 }
 
 const OpportunityDetailsPage = () => {
-  const {data:session} = useSession();
+  const { data: session } = useSession();
   const user = session?.user;
   const { id } = useParams();
   const router = useRouter();
@@ -47,13 +46,15 @@ const OpportunityDetailsPage = () => {
   }, [id]);
 
   if (loading)
-    return <div className="flex items-center justify-center min-h-screen"><Spinner className="text-[#FF6B35]" size="lg" /></div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Spinner className="text-[#FF6B35]" size="lg" />
+      </div>
+    );
   if (!opportunity)
     return (
       <div className="p-6 text-sm text-gray-500">Opportunity not found.</div>
     );
-
-    
 
   const {
     roleTitle,
@@ -62,8 +63,6 @@ const OpportunityDetailsPage = () => {
     commitmentLevel,
     deadline,
   } = opportunity;
-
-  
 
   return (
     <div className="mx-auto max-w-3xl p-6">
@@ -138,10 +137,20 @@ const OpportunityDetailsPage = () => {
               </p>
             </div>
           </div>
-          
-          {user?.role === "collaborator" ?<ApplyModal opportunityId={opportunity._id} applicantEmail={user.email}/>: <Card className="mt-4 shadow-sm">
-           <p className="text-[#FF6B35] text-center"> please login as a collaborator to apply for this opportunity.</p>
-            </Card>}
+
+          {user?.role === "collaborator" ? (
+            <ApplyModal
+              opportunityId={opportunity._id}
+              applicantEmail={user.email}
+            />
+          ) : (
+            <Card className="mt-4 shadow-sm">
+              <p className="text-[#FF6B35] text-center">
+                {" "}
+                please login as a collaborator to apply for this opportunity.
+              </p>
+            </Card>
+          )}
         </div>
       </div>
     </div>

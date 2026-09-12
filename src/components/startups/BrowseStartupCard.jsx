@@ -6,23 +6,21 @@ import Link from "next/link";
 import Image from "next/image";
 
 const BrowseStartupCard = ({ startup }) => {
-  const {
-    _id,
-    name,
-    logoUrl,
-    industry,
-    description,
-    fundingStage,
-  } = startup;
+  const { _id, name, logoUrl, industry, description, fundingStage } = startup;
 
   return (
     <div className="group overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition-all duration-300 hover:shadow-lg">
-
       {/* Top Section */}
       <div className="relative flex items-center gap-3 bg-linear-to-br from-[#131B3A] to-[#273766] px-6 py-4">
         <div className="flex h-15 w-15 items-center justify-center overflow-hidden rounded-full bg-white">
           {logoUrl ? (
-            <Image width={40} height={40} src={logoUrl} alt={name} className="h-full w-full object-cover" />
+            <Image
+              width={40}
+              height={40}
+              src={logoUrl}
+              alt={name}
+              className="h-full w-full object-cover"
+            />
           ) : (
             <span className="text-sm font-bold text-[#131B3A]">
               {name?.charAt(0)}
@@ -30,7 +28,9 @@ const BrowseStartupCard = ({ startup }) => {
           )}
         </div>
 
-        <span className="line-clamp-1 text-md font-semibold text-white">{name}</span>
+        <span className="line-clamp-1 text-md font-semibold text-white">
+          {name}
+        </span>
       </div>
 
       {/* Content */}
@@ -42,7 +42,9 @@ const BrowseStartupCard = ({ startup }) => {
         )}
 
         {description && (
-          <p className="mt-3 line-clamp-2 text-sm text-gray-600">{description}</p>
+          <p className="mt-3 line-clamp-2 text-sm text-gray-600">
+            {description}
+          </p>
         )}
 
         {fundingStage && (

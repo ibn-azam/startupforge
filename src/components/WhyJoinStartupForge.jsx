@@ -70,7 +70,10 @@ export default function WhyJoinStartupForge() {
         className="relative z-10 mx-auto max-w-6xl"
       >
         {/* header */}
-        <motion.div variants={itemVariants} className="mx-auto mb-14 max-w-3xl text-center">
+        <motion.div
+          variants={itemVariants}
+          className="mx-auto mb-14 max-w-3xl text-center"
+        >
           <h2 className="mt-3 font-space-grotesk text-4xl font-extrabold leading-[1.15] tracking-tight sm:text-6xl">
             <span className="text-[#131B3A]">Everything you need</span>{" "}
             <br className="hidden sm:inline" />
@@ -85,7 +88,10 @@ export default function WhyJoinStartupForge() {
         </motion.div>
 
         {/* bento grid */}
-        <motion.div variants={containerVariants} className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+        <motion.div
+          variants={containerVariants}
+          className="grid grid-cols-1 gap-6 sm:grid-cols-2"
+        >
           {features.map((feature) => {
             const Icon = feature.icon;
             return (

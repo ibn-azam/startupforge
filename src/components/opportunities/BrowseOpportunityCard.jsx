@@ -37,7 +37,6 @@ const BrowseOpportunityCard = ({ opportunity }) => {
 
   return (
     <div className="group overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition-all duration-300 hover:shadow-lg">
-
       {/* Top Section */}
       <div className="relative flex items-center justify-between bg-linear-to-br from-[#131B3A] to-[#273766] px-6 py-4">
         <span className="text-sm font-semibold text-white/80">Opportunity</span>
@@ -55,11 +54,15 @@ const BrowseOpportunityCard = ({ opportunity }) => {
 
       {/* Content */}
       <div className="p-6">
-        <h3 className="line-clamp-1 text-xl font-bold text-[#131B3A]">{roleTitle}</h3>
+        <h3 className="line-clamp-1 text-xl font-bold text-[#131B3A]">
+          {roleTitle}
+        </h3>
 
         <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
           {commitmentLevel && (
-            <p className="text-sm font-medium text-[#FF6B35]">{commitmentLevel}</p>
+            <p className="text-sm font-medium text-[#FF6B35]">
+              {commitmentLevel}
+            </p>
           )}
           {industry && (
             <span className="rounded-md bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">

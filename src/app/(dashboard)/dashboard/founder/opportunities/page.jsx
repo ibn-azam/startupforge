@@ -58,7 +58,7 @@ const AllOpportunitiesPage = () => {
 
   const handleOpportunityUpdate = (updated) => {
     setOpportunities((prev) =>
-      prev.map((o) => (o._id === updated._id ? { ...o, ...updated } : o))
+      prev.map((o) => (o._id === updated._id ? { ...o, ...updated } : o)),
     );
   };
 
@@ -71,7 +71,6 @@ const AllOpportunitiesPage = () => {
   return (
     <div className="min-h-screen  p-6">
       <div className="mx-auto max-w-7xl">
-
         {/* Header */}
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
@@ -111,8 +110,8 @@ const AllOpportunitiesPage = () => {
             </h3>
 
             <p className="mt-2 max-w-md text-sm text-gray-500">
-              You haven&apos;t posted any opportunities yet. Add your first
-              role to start recruiting collaborators.
+              You haven&apos;t posted any opportunities yet. Add your first role
+              to start recruiting collaborators.
             </p>
 
             <Link

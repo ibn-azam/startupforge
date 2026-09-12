@@ -27,10 +27,16 @@ export function FounderStatistics({ stats = [] }) {
 
       <div className="h-80 w-full rounded-xl border border-[#6B7280]/30 bg-[#FAFAFA] p-4 shadow-sm">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={chartData} margin={{ top: 8, right: 8, left: 0, bottom: 8 }}>
+          <BarChart
+            data={chartData}
+            margin={{ top: 8, right: 8, left: 0, bottom: 8 }}
+          >
             <CartesianGrid stroke="#E5E7EB" vertical={false} />
             <XAxis dataKey="name" tick={{ fill: "#131B3A", fontSize: 12 }} />
-            <YAxis allowDecimals={false} tick={{ fill: "#6B7280", fontSize: 12 }} />
+            <YAxis
+              allowDecimals={false}
+              tick={{ fill: "#6B7280", fontSize: 12 }}
+            />
             <Tooltip
               cursor={{ fill: "#FFF1EB" }}
               contentStyle={{
@@ -38,7 +44,12 @@ export function FounderStatistics({ stats = [] }) {
                 borderRadius: "8px",
               }}
             />
-            <Bar dataKey="value" name="Count" fill="#FF6B35" radius={[6, 6, 0, 0]} />
+            <Bar
+              dataKey="value"
+              name="Count"
+              fill="#FF6B35"
+              radius={[6, 6, 0, 0]}
+            />
           </BarChart>
         </ResponsiveContainer>
       </div>

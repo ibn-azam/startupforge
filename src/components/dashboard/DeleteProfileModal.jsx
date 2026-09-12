@@ -3,13 +3,13 @@
 import { TrashBin } from "@gravity-ui/icons";
 import { AlertDialog, Button } from "@heroui/react";
 
-export function DeleteAlert({ handleDelete, isDeleting, startup, name }) {
-  const itemName = name || startup?.name || "this item";
+export function DeleteProfileModal({ handleDelete, isDeleting, name }) {
+  const itemName = name || "your account";
 
   return (
     <AlertDialog>
       <Button color="danger" variant="danger" className="flex-1">
-        Delete
+        Delete my account
       </Button>
       <AlertDialog.Backdrop>
         <AlertDialog.Container>
@@ -24,7 +24,8 @@ export function DeleteAlert({ handleDelete, isDeleting, startup, name }) {
             <AlertDialog.Body>
               <p>
                 This will permanently delete <strong>{itemName}</strong> and all
-                of its data. This action cannot be undone.
+                of its data, including your profile, applications, and any
+                startups you manage. This action cannot be undone.
               </p>
             </AlertDialog.Body>
             <AlertDialog.Footer>
@@ -39,7 +40,7 @@ export function DeleteAlert({ handleDelete, isDeleting, startup, name }) {
                 startContent={!isDeleting && <TrashBin size={16} />}
                 onPress={handleDelete}
               >
-                Delete Startup
+                Delete Account
               </Button>
             </AlertDialog.Footer>
           </AlertDialog.Dialog>

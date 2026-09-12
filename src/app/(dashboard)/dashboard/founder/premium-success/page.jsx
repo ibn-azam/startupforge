@@ -35,21 +35,24 @@ export default async function Success({ searchParams }) {
   // =========================
   // RECORD PAYMENT FIRST
   // =========================
-  const paymentResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/payments`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
+  const paymentResponse = await fetch(
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/payments`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        user_email: email,
+        amount: session.amount_total,
+        transaction_id: session.id,
+        payment_status: session.payment_status,
+        paid_at: new Date(session.created * 1000).toISOString(),
+      }),
+      cache: "no-store",
     },
-    body: JSON.stringify({
-      user_email: email,
-      amount: session.amount_total,
-      transaction_id: session.id,
-      payment_status: session.payment_status,
-      paid_at: new Date(session.created * 1000).toISOString(),
-    }),
-    cache: "no-store",
-  });
+  );
 
   if (!paymentResponse.ok) {
     throw new Error("Unable to record the verified payment.");
@@ -58,15 +61,18 @@ export default async function Success({ searchParams }) {
   // =========================
   // UPDATE USER isPremium
   // =========================
-  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/user/${email}`, {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/user/${email}`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ isPremium: true }),
+      cache: "no-store",
     },
-    body: JSON.stringify({ isPremium: true }),
-    cache: "no-store",
-  });
+  );
 
   if (!res.ok) {
     throw new Error("Unable to update premium status.");

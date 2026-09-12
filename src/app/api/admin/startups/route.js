@@ -17,7 +17,9 @@ export async function GET() {
       return NextResponse.json({ message: "Unauthorized" }, { status: 403 });
     }
 
-    return NextResponse.json({ startups: await getAdminStartups(await getAuthToken()) });
+    return NextResponse.json({
+      startups: await getAdminStartups(await getAuthToken()),
+    });
   } catch (error) {
     console.error("Failed to load admin startups:", error);
     return NextResponse.json(
@@ -40,10 +42,15 @@ export async function PATCH(request) {
 
     const { startupId } = await request.json();
     if (!startupId) {
-      return NextResponse.json({ message: "startupId is required." }, { status: 400 });
+      return NextResponse.json(
+        { message: "startupId is required." },
+        { status: 400 },
+      );
     }
 
-    return NextResponse.json({ startup: await approveAdminStartup(startupId, await getAuthToken()) });
+    return NextResponse.json({
+      startup: await approveAdminStartup(startupId, await getAuthToken()),
+    });
   } catch (error) {
     console.error("Failed to approve startup:", error);
     return NextResponse.json(
@@ -61,10 +68,15 @@ export async function DELETE(request) {
 
     const { startupId } = await request.json();
     if (!startupId) {
-      return NextResponse.json({ message: "startupId is required." }, { status: 400 });
+      return NextResponse.json(
+        { message: "startupId is required." },
+        { status: 400 },
+      );
     }
 
-    return NextResponse.json({ startup: await removeAdminStartup(startupId, await getAuthToken()) });
+    return NextResponse.json({
+      startup: await removeAdminStartup(startupId, await getAuthToken()),
+    });
   } catch (error) {
     console.error("Failed to remove startup:", error);
     return NextResponse.json(

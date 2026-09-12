@@ -1,32 +1,42 @@
 const dns = require("node:dns");
 dns.setServers(["8.8.8.8", "8.8.4.4"]);
-
-import { Geist, Geist_Mono } from "next/font/google";
+("use client");
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { ToastContainer } from "react-toastify";
+import { usePathname } from "next/navigation";
+import { useEffect } from "react";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-inter",
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-export const metadata = {
-  title: "StartupForge",
-  description: "Connect founders with collaborators and opportunities.",
+const routeTitles = {
+  "/": "StartupForge",
+  "/dashboard/founder": "Founder Dashboard",
+  "/dashboard/collaborator": "Collaborator Dashboard",
+  "/dashboard/admin": "Admin Dashboard",
+  "/browse-opportunities": "Browse-Opportunities",
+  "/browse-startups": "Browse-Opportunities",
+  "/unauthorized": "Unauthorized",
+  "/login": "Login",
+  "/signup": "Signup",
 };
 
 export default function RootLayout({ children }) {
+  const pathname = usePathname();
+
+  useEffect(() => {
+    document.title = routeTitles[pathname]
+      ? `${routeTitles[pathname]} | StartupForge`
+      : "StartupForge";
+  }, [pathname]);
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full">
+    <html lang="en" className={`${inter.variable} h-full antialiased`}>
+      <body className="font-sans min-h-full">
         <main>
           {children}
           <ToastContainer />

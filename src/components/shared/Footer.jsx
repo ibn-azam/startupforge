@@ -11,18 +11,15 @@ export default function Footer() {
         { label: "Job Discovery", href: "/jobs" },
         { label: "Worker AI", href: "/worker-ai" },
         { label: "Companies", href: "/companies" },
-        { label: "Salary Data", href: 
-          "/salary-data" },
+        { label: "Salary Data", href: "/salary-data" },
       ],
     },
     {
       title: "Navigation",
       links: [
         { label: "Home", href: "/" },
-        { label: "Browse Startups", href: 
-          "/browse-startups" },
-        { label: "Browse Opportunities", href: 
-          "/browse-opportunities" },
+        { label: "Browse Startups", href: "/browse-startups" },
+        { label: "Browse Opportunities", href: "/browse-opportunities" },
       ],
     },
     {
@@ -47,8 +44,8 @@ export default function Footer() {
           </Link>
 
           <p className="mt-4 text-sm leading-relaxed text-[#6B7280]">
-            The AI-native career platform. Built for people who take their
-            work seriously.
+            The AI-native career platform. Built for people who take their work
+            seriously.
           </p>
         </div>
 

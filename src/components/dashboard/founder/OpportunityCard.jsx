@@ -1,15 +1,14 @@
 "use client";
 
 import { useState } from "react";
+
 import { Button } from "@heroui/react";
-import {
-  Calendar,
-  PencilToSquare,
-  Check,
-  Xmark,
-} from "@gravity-ui/icons";
+
+import { Calendar, PencilToSquare, Check, Xmark } from "@gravity-ui/icons";
+
 import { toast } from "react-toastify";
 import { DeleteAlert } from "./DeleteAlert";
+import { authClient } from "@/lib/auth-client";
 
 const WORK_TYPE_STYLES = {
   Remote: "bg-emerald-50 text-emerald-700",
@@ -60,30 +59,54 @@ const OpportunityCard = ({ opportunity, onUpdate, onDelete }) => {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "";
 
   const updateField = (field) => (e) =>
-    setForm((prev) => ({ ...prev, [field]: e.target.value }));
+    setForm((prev) => ({
+      ...prev,
+      [field]: e.target.value,
+    }));
 
   // Handle Dynamic Delete Call
   const handleDelete = async () => {
     try {
       setIsDeleting(true);
 
+      // Get JWT token
+      const { data } = await authClient.token();
+      const token = data?.token;
+
+      if (!token) {
+        throw new Error("Authentication token not found.");
+      }
+
       const response = await fetch(`${baseUrl}/api/opportunities/${_id}`, {
         method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       const contentType = response.headers.get("content-type") || "";
-      const data = contentType.includes("application/json")
+
+      const dataResponse = contentType.includes("application/json")
         ? await response.json()
         : { message: await response.text() };
 
       if (!response.ok) {
-        throw new Error(data?.message || `Request failed with status ${response.status}`);
+        throw new Error(
+          dataResponse?.message ||
+            `Request failed with status ${response.status}`,
+        );
       }
 
       toast.success("Opportunity Deleted Successfully");
+
       onDelete?.(_id);
     } catch (error) {
-      toast.error(error.message || "Something went wrong while deleting the opportunity.");
+      console.error("Delete error:", error);
+
+      toast.error(
+        error.message || "Something went wrong while deleting the opportunity.",
+      );
     } finally {
       setIsDeleting(false);
     }
@@ -122,7 +145,8 @@ const OpportunityCard = ({ opportunity, onUpdate, onDelete }) => {
 
     const isUnchanged =
       payload.roleTitle === (roleTitle || "") &&
-      JSON.stringify(payload.requiredSkills) === JSON.stringify(requiredSkills || []) &&
+      JSON.stringify(payload.requiredSkills) ===
+        JSON.stringify(requiredSkills || []) &&
       payload.workType === (workType || "") &&
       payload.commitmentLevel === (commitmentLevel || "") &&
       payload.deadline === (deadline ? deadline.slice(0, 10) : "");
@@ -135,27 +159,50 @@ const OpportunityCard = ({ opportunity, onUpdate, onDelete }) => {
     try {
       setIsSaving(true);
 
+      // Get JWT token
+      const { data } = await authClient.token();
+      const token = data?.token;
+
+      if (!token) {
+        throw new Error("Authentication token not found.");
+      }
+
       const response = await fetch(`${baseUrl}/api/opportunities/${_id}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify(payload),
       });
 
       const contentType = response.headers.get("content-type") || "";
-      const data = contentType.includes("application/json")
+
+      const dataResponse = contentType.includes("application/json")
         ? await response.json()
         : { message: await response.text() };
 
       if (!response.ok) {
-        throw new Error(data?.message || `Request failed with status ${response.status}`);
+        throw new Error(
+          dataResponse?.message ||
+            `Request failed with status ${response.status}`,
+        );
       }
 
       setIsEditing(false);
+
       toast.success("Opportunity Updated Successfully");
-      onUpdate?.({ ...opportunity, ...payload });
+
+      onUpdate?.({
+        ...opportunity,
+        ...payload,
+      });
     } catch (error) {
       console.error("Edit error:", error);
-      toast.error(error.message || "Something went wrong while updating the opportunity.");
+
+      toast.error(
+        error.message || "Something went wrong while updating the opportunity.",
+      );
     } finally {
       setIsSaving(false);
     }
@@ -165,7 +212,6 @@ const OpportunityCard = ({ opportunity, onUpdate, onDelete }) => {
 
   return (
     <div className="group overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition-all duration-300 hover:shadow-lg">
-
       {/* Top Section */}
       <div className="relative flex items-center justify-between bg-linear-to-br from-[#131B3A] to-[#273766] px-6 py-4">
         <span className="text-sm font-semibold text-white/80">Opportunity</span>
@@ -189,15 +235,14 @@ const OpportunityCard = ({ opportunity, onUpdate, onDelete }) => {
 
       {/* Content */}
       <div className="p-6">
-
         {isEditing ? (
           <div className="flex flex-col gap-4">
-
             {/* Role Title */}
             <div>
               <label className="text-xs font-semibold uppercase tracking-wide text-gray-400">
                 Role Title
               </label>
+
               <input
                 type="text"
                 autoFocus
@@ -213,6 +258,7 @@ const OpportunityCard = ({ opportunity, onUpdate, onDelete }) => {
               <label className="text-xs font-semibold uppercase tracking-wide text-gray-400">
                 Required Skills
               </label>
+
               <input
                 type="text"
                 placeholder="e.g. React, Node.js, Figma"
@@ -221,7 +267,10 @@ const OpportunityCard = ({ opportunity, onUpdate, onDelete }) => {
                 disabled={busy}
                 className={fieldClass}
               />
-              <p className="mt-1 text-xs text-gray-400">Separate skills with commas.</p>
+
+              <p className="mt-1 text-xs text-gray-400">
+                Separate skills with commas.
+              </p>
             </div>
 
             {/* Work Type + Commitment Level */}
@@ -230,6 +279,7 @@ const OpportunityCard = ({ opportunity, onUpdate, onDelete }) => {
                 <label className="text-xs font-semibold uppercase tracking-wide text-gray-400">
                   Work Type
                 </label>
+
                 <input
                   type="text"
                   placeholder="Remote / Onsite / Hybrid"
@@ -244,6 +294,7 @@ const OpportunityCard = ({ opportunity, onUpdate, onDelete }) => {
                 <label className="text-xs font-semibold uppercase tracking-wide text-gray-400">
                   Commitment Level
                 </label>
+
                 <input
                   type="text"
                   placeholder="Full-time / Part-time"
@@ -260,6 +311,7 @@ const OpportunityCard = ({ opportunity, onUpdate, onDelete }) => {
               <label className="text-xs font-semibold uppercase tracking-wide text-gray-400">
                 Deadline
               </label>
+
               <input
                 type="date"
                 value={form.deadline}
@@ -272,11 +324,15 @@ const OpportunityCard = ({ opportunity, onUpdate, onDelete }) => {
         ) : (
           <>
             {/* Role Title */}
-            <h3 className="line-clamp-1 text-xl font-bold text-[#131B3A]">{roleTitle}</h3>
+            <h3 className="line-clamp-1 text-xl font-bold text-[#131B3A]">
+              {roleTitle}
+            </h3>
 
             {/* Commitment Level */}
             {commitmentLevel && (
-              <p className="mt-1 text-sm font-medium text-[#FF6B35]">{commitmentLevel}</p>
+              <p className="mt-1 text-sm font-medium text-[#FF6B35]">
+                {commitmentLevel}
+              </p>
             )}
 
             {/* Skills */}
@@ -301,6 +357,7 @@ const OpportunityCard = ({ opportunity, onUpdate, onDelete }) => {
 
               <div>
                 <p className="text-xs text-gray-400">Deadline</p>
+
                 <p className="text-sm font-semibold text-gray-700">
                   {formatDeadline(deadline)}
                 </p>

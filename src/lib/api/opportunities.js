@@ -1,41 +1,46 @@
 import { authClient } from "../auth-client";
 
-
-const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
 export const getAuthHeaders = async () => {
   const { data } = await authClient.token();
-  console.log(data)
   return {
     "Content-Type": "application/json",
     Authorization: `Bearer ${data?.token}`,
   };
 };
 
-export const getFounderOpportunities = async(email)=>{
-  const headers = await getAuthHeaders();
-  
-    const res = await fetch(`${baseUrl}/api/opportunities/${email}`,{headers});
-    return res.json();
-}
+export const getFounderOpportunities = async (email, requestHeaders) => {
+  const headers = requestHeaders || (await getAuthHeaders());
+  const res = await fetch(`${baseUrl}/api/opportunities/${email}`, { headers });
+
+  if (!res.ok) {
+    console.error("FOUNDER OPPORTUNITIES ERROR:", res.status, await res.text());
+    return { opportunities: [] };
+  }
+
+  return res.json();
+};
 
 export const getOpportunities = async () => {
-    const res = await fetch(`${baseUrl}/api/opportunities`);
-    return res.json();
-}
+  const res = await fetch(`${baseUrl}/api/opportunities`);
+  return res.json();
+};
 
 export const getOpportunityById = async (id) => {
-    const res = await fetch(`${baseUrl}/api/opportunity/${id}`);
-    return res.json();
-}
+  const res = await fetch(`${baseUrl}/api/opportunity/${id}`);
+  return res.json();
+};
 
 export const getOpportunitiesByFilter = async (filters = {}) => {
   const params = new URLSearchParams();
 
   if (filters.search) params.append("search", filters.search);
-  if (filters.workType && filters.workType !== "All") params.append("workType", filters.workType);
-  if (filters.industry && filters.industry !== "All") params.append("industry", filters.industry);
-  
+  if (filters.workType && filters.workType !== "All")
+    params.append("workType", filters.workType);
+  if (filters.industry && filters.industry !== "All")
+    params.append("industry", filters.industry);
+
   // Pagination parameters
   if (filters.page) params.append("page", filters.page);
   if (filters.limit) params.append("limit", filters.limit);
@@ -45,12 +50,8 @@ export const getOpportunitiesByFilter = async (filters = {}) => {
   return res.json();
 };
 
-
-
 export async function getLatestOpportunities(limit = 3) {
-  const res = await fetch(
-    `${baseUrl}/opportunities/latest?limit=${limit}`
-  );
+  const res = await fetch(`${baseUrl}/api/opportunities/latest?limit=${limit}`);
   const data = await res.json();
   return data;
 }

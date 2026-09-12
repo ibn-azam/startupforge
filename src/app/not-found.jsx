@@ -17,11 +17,32 @@ export default function NotFound() {
             xmlns="http://www.w3.org/2000/svg"
           >
             {/* ground shadow */}
-            <ellipse cx="160" cy="240" rx="110" ry="12" fill="#131B3A" opacity="0.08" />
+            <ellipse
+              cx="160"
+              cy="240"
+              rx="110"
+              ry="12"
+              fill="#131B3A"
+              opacity="0.08"
+            />
 
             {/* anvil base */}
-            <rect x="120" y="190" width="80" height="34" rx="4" fill="#131B3A" />
-            <rect x="132" y="176" width="56" height="18" rx="3" fill="#1E2A52" />
+            <rect
+              x="120"
+              y="190"
+              width="80"
+              height="34"
+              rx="4"
+              fill="#131B3A"
+            />
+            <rect
+              x="132"
+              y="176"
+              width="56"
+              height="18"
+              rx="3"
+              fill="#1E2A52"
+            />
 
             {/* anvil body */}
             <path
@@ -49,7 +70,12 @@ export default function NotFound() {
               <circle cx="150" cy="86" r="4" fill="#FF6B35" />
               <circle cx="176" cy="70" r="3" fill="#FF6B35" />
               <circle cx="132" cy="66" r="2.5" fill="#FF6B35" />
-              <path d="M150 86l6-14M176 70l4-12M132 66l-3-10" stroke="#FF6B35" strokeWidth="2" strokeLinecap="round" />
+              <path
+                d="M150 86l6-14M176 70l4-12M132 66l-3-10"
+                stroke="#FF6B35"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
             </g>
 
             {/* 404 stamped on the anvil face */}
@@ -73,8 +99,8 @@ export default function NotFound() {
           This page never made it off the anvil
         </h1>
         <p className="mt-4 font-inter text-base text-slate-500 max-w-sm">
-          The page you&apos;re looking for doesn&apos;t exist or may have been moved.
-          Let&apos;s get you back to solid ground.
+          The page you&apos;re looking for doesn&apos;t exist or may have been
+          moved. Let&apos;s get you back to solid ground.
         </p>
 
         {/* Back home button */}
@@ -91,7 +117,8 @@ export default function NotFound() {
           animation: anvil-float 3.5s ease-in-out infinite;
         }
         @keyframes anvil-float {
-          0%, 100% {
+          0%,
+          100% {
             transform: translateY(0);
           }
           50% {
@@ -108,7 +135,8 @@ export default function NotFound() {
           animation-delay: 0.6s;
         }
         @keyframes spark-flicker {
-          0%, 100% {
+          0%,
+          100% {
             opacity: 1;
           }
           50% {

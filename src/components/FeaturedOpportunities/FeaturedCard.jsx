@@ -160,7 +160,10 @@ export default function FeaturedCard({ opportunities }) {
                 </div>
 
                 <div className="mt-6 border-t border-gray-100 pt-5">
-                  <Link href={`/browse-opportunities/${opp._id}`} className="block">
+                  <Link
+                    href={`/browse-opportunities/${opp._id}`}
+                    className="block"
+                  >
                     <Button
                       className="w-full bg-[#131B3A] text-white"
                       endContent={<ArrowRight size={16} />}
@@ -175,10 +178,7 @@ export default function FeaturedCard({ opportunities }) {
         </div>
 
         <motion.div variants={itemVariants} className="flex justify-center">
-          <motion.div
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-          >
+          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
             <Link href="/browse-opportunities">
               <Button
                 variant="bordered"

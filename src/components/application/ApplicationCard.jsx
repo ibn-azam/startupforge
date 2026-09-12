@@ -12,11 +12,21 @@ function formatDate(date) {
   if (!date) return "—";
   const d = new Date(date);
   if (Number.isNaN(d.getTime())) return date;
-  return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  return d.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
 }
 
 const ApplicationCard = ({ application }) => {
-  const { opportunity = {}, status, portfolioLink, motivationMessage, appliedAt } = application;
+  const {
+    opportunity = {},
+    status,
+    portfolioLink,
+    motivationMessage,
+    appliedAt,
+  } = application;
   const { roleTitle, workType, commitmentLevel } = opportunity;
 
   return (
@@ -40,7 +50,9 @@ const ApplicationCard = ({ application }) => {
         {(commitmentLevel || workType) && (
           <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
             {commitmentLevel && (
-              <p className="text-sm font-medium text-[#FF6B35]">{commitmentLevel}</p>
+              <p className="text-sm font-medium text-[#FF6B35]">
+                {commitmentLevel}
+              </p>
             )}
             {workType && (
               <span className="rounded-md bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
@@ -54,8 +66,9 @@ const ApplicationCard = ({ application }) => {
           <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
             Portfolio Link
           </p>
-          
-            <a href={portfolioLink}
+
+          <a
+            href={portfolioLink}
             target="_blank"
             rel="noopener noreferrer"
             className="mt-1 block truncate text-sm font-medium text-[#131B3A] underline"
@@ -77,7 +90,9 @@ const ApplicationCard = ({ application }) => {
           </div>
           <div>
             <p className="text-xs text-gray-400">Applied On</p>
-            <p className="text-sm font-semibold text-gray-700">{formatDate(appliedAt)}</p>
+            <p className="text-sm font-semibold text-gray-700">
+              {formatDate(appliedAt)}
+            </p>
           </div>
         </div>
       </div>

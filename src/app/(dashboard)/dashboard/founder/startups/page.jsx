@@ -13,20 +13,17 @@ import {
   Card,
 } from "@heroui/react";
 
-import {
-  CloudArrowUpIn,
-  TriangleExclamation,
-  Check,
-} from "@gravity-ui/icons";
+import { CloudArrowUpIn, TriangleExclamation, Check } from "@gravity-ui/icons";
 
 import { uploadImageToImgbb } from "@/lib/actions/actions";
 import { authClient } from "@/lib/auth-client";
-import { createStartup } from "@/lib/actions/startups";
 import { getFounderStartups } from "@/lib/api/startups";
 import StartupCard from "@/components/dashboard/founder/StartupCard";
 
 import { toast } from "react-toastify";
 import Image from "next/image";
+
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
 const INDUSTRIES = [
   "Fintech",
@@ -50,8 +47,7 @@ const FUNDING_STAGES = [
 ];
 
 export default function StartupsPage() {
-  const { data: session, isPending: sessionLoading } =
-    authClient.useSession();
+  const { data: session, isPending: sessionLoading } = authClient.useSession();
 
   // =========================
   // STARTUPS STATE
@@ -114,11 +110,8 @@ export default function StartupsPage() {
 
         const data = await getFounderStartups(email);
 
-        console.log("getFounderStartups response:", data);
-
         if (cancelled) return;
 
-       
         const list = Array.isArray(data)
           ? data
           : Array.isArray(data?.startups)
@@ -150,6 +143,32 @@ export default function StartupsPage() {
   }, [session?.user?.email, sessionLoading]);
 
   // =========================
+  // REVOKE LOGO PREVIEW OBJECT URL
+  // =========================
+  useEffect(() => {
+    return () => {
+      if (logoPreview) {
+        URL.revokeObjectURL(logoPreview);
+      }
+    };
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // =========================
+  // STARTUP CALLBACK HANDLERS
+  // =========================
+  const handleStartupUpdate = (updatedStartup) => {
+    setStartups((prev) =>
+      prev.map((s) => (s._id === updatedStartup._id ? updatedStartup : s)),
+    );
+  };
+
+  const handleStartupDelete = (deletedId) => {
+    setStartups((prev) => prev.filter((s) => s._id !== deletedId));
+  };
+
+  // =========================
   // LOGO UPLOAD
   // =========================
   const handleLogoChange = async (e) => {
@@ -160,12 +179,14 @@ export default function StartupsPage() {
     // Validate image
     if (!file.type.startsWith("image/")) {
       toast.error("Please select an image file.");
+      e.target.value = "";
       return;
     }
 
     // Validate size
     if (file.size > 5 * 1024 * 1024) {
       toast.error("Image must be smaller than 5MB.");
+      e.target.value = "";
       return;
     }
 
@@ -173,6 +194,11 @@ export default function StartupsPage() {
     setError("");
     setLogoUrl("");
     setLogoState("uploading");
+
+    // Revoke previous preview URL
+    if (logoPreview) {
+      URL.revokeObjectURL(logoPreview);
+    }
 
     // Preview
     const previewUrl = URL.createObjectURL(file);
@@ -204,6 +230,8 @@ export default function StartupsPage() {
       setLogoState("error");
 
       toast.error("Logo upload failed. Please try again.");
+    } finally {
+      e.target.value = "";
     }
   };
 
@@ -211,6 +239,10 @@ export default function StartupsPage() {
   // RESET FORM
   // =========================
   const resetForm = () => {
+    if (logoPreview) {
+      URL.revokeObjectURL(logoPreview);
+    }
+
     setName("");
     setIndustry(null);
     setDescription("");
@@ -219,6 +251,44 @@ export default function StartupsPage() {
     setLogoUrl("");
     setLogoState("idle");
     setError("");
+  };
+
+  // =========================
+  // CREATE STARTUP
+  // =========================
+  const createStartupDirectly = async (newStartupData) => {
+    const { data } = await authClient.token();
+
+    const token = data?.token;
+
+    if (!token) {
+      throw new Error("Authentication token not found.");
+    }
+
+    const res = await fetch(`${baseUrl}/api/startup`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(newStartupData),
+    });
+
+    let result = null;
+
+    try {
+      result = await res.json();
+    } catch {
+      result = null;
+    }
+
+    if (!res.ok) {
+      throw new Error(
+        result?.message || result?.error || "Failed to create startup.",
+      );
+    }
+
+    return result;
   };
 
   // =========================
@@ -244,12 +314,7 @@ export default function StartupsPage() {
     }
 
     // Validate fields
-    if (
-      !name.trim() ||
-      !industry ||
-      !description.trim() ||
-      !fundingStage
-    ) {
+    if (!name.trim() || !industry || !description.trim() || !fundingStage) {
       const message = "Please fill in all required fields.";
 
       setError(message);
@@ -295,17 +360,14 @@ export default function StartupsPage() {
         industry: String(industry),
         description: description.trim(),
         fundingStage: String(fundingStage),
-        founderEmail: session?.user?.email || email,
+        founderEmail: email,
       };
 
-      console.log("Creating startup:", payload);
-
-      const data = await createStartup(payload);
-
-
       // =========================
-      // CHECK API RESPONSE
+      // CREATE STARTUP
       // =========================
+      const data = await createStartupDirectly(payload);
+
       if (!data) {
         throw new Error("No response received from server.");
       }
@@ -314,23 +376,24 @@ export default function StartupsPage() {
         throw new Error(data.error);
       }
 
-      // MongoDB usually returns insertedId
-      const insertedId =
-        data?.insertedId ||
-        data?.data?.insertedId ||
-        data?.startup?._id ||
-        data?._id;
+      if (data?.success === false) {
+        throw new Error(data?.message || "Failed to create startup.");
+      }
 
       // =========================
-      // CREATE LOCAL STARTUP
+      // REFETCH STARTUPS
       // =========================
-      const newStartup = {
-        _id: insertedId || `temp-${Date.now()}`,
-        ...payload,
-      };
+      const updatedData = await getFounderStartups(email);
 
-      // Add immediately to UI
-      setStartups((prev) => [newStartup, ...prev]);
+      const updatedStartups = Array.isArray(updatedData)
+        ? updatedData
+        : Array.isArray(updatedData?.startups)
+          ? updatedData.startups
+          : Array.isArray(updatedData?.data)
+            ? updatedData.data
+            : [];
+
+      setStartups(updatedStartups);
 
       toast.success("Startup added successfully!");
 
@@ -363,9 +426,7 @@ export default function StartupsPage() {
   if (sessionLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <p className="text-sm text-gray-500">
-          Loading...
-        </p>
+        <p className="text-sm text-gray-500">Loading...</p>
       </div>
     );
   }
@@ -391,9 +452,7 @@ export default function StartupsPage() {
         ========================= */}
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h2 className="text-3xl font-bold text-[#131B3A]">
-              My Startups
-            </h2>
+            <h2 className="text-3xl font-bold text-[#131B3A]">My Startups</h2>
 
             <p className="mt-1 text-sm text-gray-500">
               Manage your startups, update information, or remove a startup.
@@ -415,9 +474,7 @@ export default function StartupsPage() {
         ========================= */}
         {loadingStartups && (
           <div className="flex min-h-[200px] items-center justify-center">
-            <p className="text-sm text-gray-500">
-              Loading startups...
-            </p>
+            <p className="text-sm text-gray-500">Loading startups...</p>
           </div>
         )}
 
@@ -426,10 +483,7 @@ export default function StartupsPage() {
         ========================= */}
         {!loadingStartups && (showForm || !hasStartups) && (
           <Card className="mx-auto max-w-xl border border-[#6B7280]/10 bg-[#FAFAFA] shadow-md">
-            <form
-              onSubmit={handleSubmit}
-              className="w-full space-y-6 p-6"
-            >
+            <form onSubmit={handleSubmit} className="w-full space-y-6 p-6">
               {/* Header */}
               <div>
                 <h1 className="font-space-grotesk text-2xl font-bold text-[#131B3A]">
@@ -448,8 +502,8 @@ export default function StartupsPage() {
                 <div className="relative flex h-24 w-24 items-center justify-center overflow-hidden rounded-full border-2 border-[#6B7280]/30 bg-[#FAFAFA]">
                   {logoPreview ? (
                     <Image
-                    width={100}
-                    height={100}
+                      width={100}
+                      height={100}
                       src={logoPreview}
                       alt="Startup logo preview"
                       className="h-full w-full object-cover"
@@ -481,9 +535,7 @@ export default function StartupsPage() {
                 </div>
 
                 <label className="cursor-pointer text-sm font-medium text-[#131B3A]">
-                  {logoState === "uploading"
-                    ? "Uploading..."
-                    : "Upload Logo"}
+                  {logoState === "uploading" ? "Uploading..." : "Upload Logo"}
 
                   <input
                     type="file"
@@ -540,11 +592,7 @@ export default function StartupsPage() {
                 <Select.Popover>
                   <ListBox>
                     {INDUSTRIES.map((item) => (
-                      <ListBox.Item
-                        key={item}
-                        id={item}
-                        textValue={item}
-                      >
+                      <ListBox.Item key={item} id={item} textValue={item}>
                         {item}
 
                         <ListBox.ItemIndicator />
@@ -589,11 +637,7 @@ export default function StartupsPage() {
                 <Select.Popover>
                   <ListBox>
                     {FUNDING_STAGES.map((stage) => (
-                      <ListBox.Item
-                        key={stage}
-                        id={stage}
-                        textValue={stage}
-                      >
+                      <ListBox.Item key={stage} id={stage} textValue={stage}>
                         {stage}
 
                         <ListBox.ItemIndicator />
@@ -606,11 +650,7 @@ export default function StartupsPage() {
               {/* =========================
                   FOUNDER EMAIL
               ========================= */}
-              <TextField
-                name="founderEmail"
-                type="email"
-                isRequired
-              >
+              <TextField name="founderEmail" type="email" isRequired>
                 <Label>Founder Email</Label>
 
                 <Input
@@ -650,15 +690,11 @@ export default function StartupsPage() {
 
                 <Button
                   type="submit"
-                  isDisabled={
-                    submitting || logoState === "uploading"
-                  }
+                  isDisabled={submitting || logoState === "uploading"}
                   isLoading={submitting}
                   className="flex-1 bg-[#FF6B35] font-medium text-white"
                 >
-                  {submitting
-                    ? "Creating Startup..."
-                    : "Create Startup"}
+                  {submitting ? "Creating Startup..." : "Create Startup"}
                 </Button>
               </div>
             </form>
@@ -671,9 +707,11 @@ export default function StartupsPage() {
         {!loadingStartups && !showForm && hasStartups && (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
             {startups.map((startup) => (
-              <StartupCard 
+              <StartupCard
                 key={startup._id}
                 startup={startup}
+                onUpdate={handleStartupUpdate}
+                onDelete={handleStartupDelete}
               />
             ))}
           </div>

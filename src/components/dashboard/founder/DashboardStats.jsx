@@ -41,7 +41,7 @@ const resolveIcon = (iconProp) => {
 
   // Case-insensitive lookup
   const matchedKey = Object.keys(iconsMap).find(
-    (key) => key.toLowerCase() === iconProp.toLowerCase()
+    (key) => key.toLowerCase() === iconProp.toLowerCase(),
   );
 
   return matchedKey ? iconsMap[matchedKey] : null;
@@ -57,7 +57,10 @@ export default function DashboardStats({ stats = [], className = "" }) {
       {stats.map((stat, index) => {
         const title = stat?.title || stat?.label || stat?.name || "Statistic";
         const rawValue = stat?.value ?? stat?.count ?? stat?.number;
-        const value = typeof rawValue === "number" || typeof rawValue === "string" ? rawValue : 0;
+        const value =
+          typeof rawValue === "number" || typeof rawValue === "string"
+            ? rawValue
+            : 0;
         const iconComponent = resolveIcon(stat?.icon);
 
         return (

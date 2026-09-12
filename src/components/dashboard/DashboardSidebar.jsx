@@ -106,7 +106,7 @@ export function DashboardSidebar() {
           <Link
             href={item.href}
             key={item.label}
-            className={`flex min-h-11 items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors ${
+            className={`flex h-12 items-center gap-3 rounded-xl px-3 text-sm transition-colors ${
               isActive
                 ? "bg-[#FF6B35] text-[#FAFAFA]"
                 : "text-foreground hover:bg-default"
@@ -128,8 +128,8 @@ export function DashboardSidebar() {
 
   return (
     <>
-      <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col justify-between border-r border-default bg-[#FAFAFA] p-4 lg:flex">
-        <div>
+      <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r border-default bg-[#FAFAFA] p-4 lg:flex">
+        <div className="min-h-0 flex-1 overflow-y-auto">
           {/* Logo */}
           <div className="my-2">
             <Link href="/">
@@ -188,7 +188,7 @@ export function DashboardSidebar() {
         </div>
 
         {/* Bottom links */}
-        <div className="flex flex-col gap-1 border-t border-[#6B7280]/20 pt-3">
+        <div className="flex shrink-0 flex-col gap-1 border-t border-[#6B7280]/20 pt-3">
           <Link
             href="/"
             className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-foreground hover:bg-default"
@@ -207,7 +207,7 @@ export function DashboardSidebar() {
           </Link>
         </div>
       </aside>
-     
+
       <Drawer className="bg-[#FAFAFA]">
         <Button
           aria-label="Open dashboard navigation"

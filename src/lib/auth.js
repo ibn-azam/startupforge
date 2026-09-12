@@ -1,7 +1,3 @@
-
-
-
-
 import { betterAuth } from "better-auth";
 import { MongoClient } from "mongodb";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
@@ -12,41 +8,39 @@ const db = client.db(process.env.MONGO_DB_COLLECTION);
 
 export const auth = betterAuth({
   database: mongodbAdapter(db, {
-    client
+    client,
   }),
-   emailAndPassword: { 
-    enabled: true, 
+  emailAndPassword: {
+    enabled: true,
   },
-  user:{
+  user: {
     deleteUser: {
       enabled: true,
     },
-    additionalFields:{
+    additionalFields: {
       role: {
-        defaultValue:  "collaborator",
+        defaultValue: "collaborator",
       },
       isPremium: {
         defaultValue: false,
-      }, 
+      },
       isBlocked: {
         defaultValue: false,
-      } 
-    }
+      },
+    },
   },
   socialProviders: {
-        google: { 
-            clientId: process.env.GOOGLE_CLIENT_ID, 
-            clientSecret: process.env.GOOGLE_CLIENT_SECRET, 
-        }, 
+    google: {
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     },
-    session:{
-      cookieCache:{
-        enabled: true,
-        strategy:"jwt",
-        maxAge: 7 * 24 * 60 * 60
-      }
+  },
+  session: {
+    cookieCache: {
+      enabled: true,
+      strategy: "jwt",
+      maxAge: 7 * 24 * 60 * 60,
     },
-    plugins:[
-      jwt()
-    ]
+  },
+  plugins: [jwt()],
 });
